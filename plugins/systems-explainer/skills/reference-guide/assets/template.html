@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- TITLE: the subject's name (2–4 words). DESCRIPTION: what the reference covers, one sentence. -->
+<title>{{Subject Name}}</title>
+<meta name="description" content="{{What this reference covers, in one sentence.}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* ============================================================
+   REFERENCE GUIDE TEMPLATE — systems-explainer plugin
+   Layout: dossier reading page. Hero with thesis + key figure, sticky contents rail,
+   one reading column (~68ch prose) with wide panels for tables, explorers and maps.
+   Same tokens as the blueprint explainer; different layout and density.
+   ============================================================ */
+
+/* ---------- 1. TOKENS ---------- */
+/* TOKENS:BEGIN — generated from shared/tokens.css by scripts/sync_tokens.py; do not edit here */
+/* ============================================================
+   SHARED DESIGN TOKENS — systems-explainer plugin
+   Single source of truth for color and type in BOTH page types
+   (blueprint explainer + reference guide). Edit here, then run:
+       python scripts/sync_tokens.py
+   which copies this block between the TOKENS:BEGIN / TOKENS:END
+   markers in every template. Never edit those blocks in place.
+   ============================================================ */
+:root {
+  /* Surfaces + ink */
+  --paper: #F3EBE0;        /* page background, warm cream */
+  --card: #FFFDF8;         /* boxes, nodes, table bodies */
+  --ink: #222222;          /* text, lines, borders (never pure black) */
+  --ink-soft: #5B5550;     /* secondary text */
+  --rule: #CFC4B4;         /* hairlines, guides */
+  --grid-dot: #E2D7C6;     /* blueprint dot grid */
+  --muted-fill: #E8DFD2;   /* grayed-out / wrong-path fill, table header fill */
+
+  /* Accent family */
+  --accent: #C55A44;       /* terracotta: the one thing to notice */
+  --accent-2: #D97746;     /* burnt orange: 2nd series */
+  --accent-3: #8C3B2D;     /* deep brick: 3rd series */
+  --olive: #6F7F4E;        /* good / allowed / works */
+  --slate: #4E6A80;        /* neutral system element, 4th series */
+  --ochre: #9A6A12;        /* human decision / judgment */
+  --on-accent: #FFFDF8;    /* text on accent fills */
+
+  /* Semantic roles (reference guide chips, callouts, explainer status) */
+  --ok: var(--olive);      /* verified, eliminated, allowed */
+  --gap: var(--accent);    /* gap, risk, trap, forbidden */
+  --ai: var(--slate);      /* AI-assisted */
+  --human: var(--ochre);   /* human decision */
+  --tint-ok: color-mix(in srgb, var(--olive) 16%, var(--card));
+  --tint-gap: color-mix(in srgb, var(--accent) 14%, var(--card));
+  --tint-ai: color-mix(in srgb, var(--slate) 15%, var(--card));
+  --tint-human: color-mix(in srgb, var(--ochre) 15%, var(--card));
+
+  /* Type families (load via the Google Fonts link in each template) */
+  --f-display: "Bebas Neue", Anton, "Arial Narrow", sans-serif;
+  --f-mono: "Space Mono", "Courier Prime", ui-monospace, monospace;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+    --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+    --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+    --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+  --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+  --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+  --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+  color-scheme: dark;
+}
+/* TOKENS:END */
+:root { --line: var(--rule); --radius: 6px; --shadow: 4px 4px 0 var(--ink); --toc-w: 230px; }
+
+/* ---------- 2. BASE ---------- */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }  /* switch/explorer/filter panels set display on themselves */
+html { scroll-padding-top: 24px; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 16px/1.6 var(--f-body);
+  padding-inline: clamp(16px, 4vw, 48px);
+  padding-block: 0 64px;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2 { font-family: var(--f-display); font-weight: 400; letter-spacing: .01em; line-height: .95; margin: 0; text-wrap: balance; }
+h3 { font: 600 18px/1.3 var(--f-body); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--f-mono); font-size: .86em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow { font: 12px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.muted { color: var(--ink-soft); }
+.small { font-size: 14.5px; }
+
+/* ---------- 3. HERO ---------- */
+.hero {
+  max-width: 1240px; margin: 0 auto; padding-block: 44px 32px;
+  display: grid; gap: 28px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: end;
+  border-bottom: 3px solid var(--ink);
+}
+.hero h1 { font-size: clamp(44px, 6vw, 78px); margin-top: 10px; }
+.hero__lede { margin-top: 14px; font-size: 18px; max-width: 64ch; }
+.hero__links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; align-items: center; }
+.companion {
+  display: inline-flex; gap: 8px; align-items: center; text-decoration: none; color: var(--ink);
+  font: 700 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 6px 14px; background: var(--card);
+}
+.companion:hover { border-color: var(--accent); color: var(--accent); }
+.theme-btn {
+  font: 700 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+  background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 12px;
+}
+.keyfig { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; display: grid; gap: 12px; }
+.keyfig__row { display: flex; gap: 14px; align-items: baseline; }
+.keyfig__num { font-family: var(--f-display); font-size: 64px; line-height: .9; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.keyfig__units { display: grid; grid-template-columns: repeat(42, 1fr); gap: 2px; }
+.keyfig__units i { aspect-ratio: 1; border-radius: 1px; background: var(--muted-fill); outline: 1px solid var(--line); outline-offset: -1px; }
+.keyfig__units i.on { background: var(--ink); outline: 0; }
+.keyfig small { color: var(--ink-soft); font-size: 13px; }
+
+/* ---------- 4. SHELL: contents rail + reading column ---------- */
+.shell { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: var(--toc-w) minmax(0, 1fr); gap: 52px; padding-top: 32px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.toc ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 1px; }
+.toc a {
+  display: grid; grid-template-columns: 28px 1fr; gap: 4px; padding: 5px 8px; border-radius: 4px;
+  text-decoration: none; color: var(--ink-soft); font-size: 14px; line-height: 1.35;
+}
+.toc a .n { font: 700 12px var(--f-mono); padding-top: 1px; }
+.toc a:hover { color: var(--ink); background: var(--card); }
+.toc a.active { color: var(--ink); background: var(--card); box-shadow: inset 3px 0 0 var(--accent); }
+.toc a.active .n { color: var(--accent); }
+main { display: grid; gap: 72px; min-width: 0; }
+main > section { display: grid; gap: 18px; min-width: 0; scroll-margin-top: 20px; }
+.sec-head { display: grid; gap: 4px; padding-bottom: 10px; border-bottom: 3px solid var(--ink); }
+.sec-head h2 { font-size: clamp(32px, 3.4vw, 44px); }
+.prose { max-width: 68ch; display: grid; gap: 12px; }
+footer { max-width: 1240px; margin: 72px auto 0; padding-top: 16px; border-top: 3px solid var(--ink); color: var(--ink-soft); font-size: 13.5px; display: grid; gap: 6px; }
+
+/* ---------- 5. COMPONENTS ---------- */
+.panel { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 18px 20px; min-width: 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.cards--wide { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.card b { font-family: var(--f-display); font-weight: 400; font-size: 22px; letter-spacing: .01em; line-height: 1; }
+.card p { font-size: 14.5px; color: var(--ink-soft); }
+
+.chip { display: inline-flex; align-items: center; font: 700 11px/1 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; white-space: nowrap; }
+.chip--ok { background: var(--tint-ok); color: var(--ok); }
+.chip--gap { background: var(--tint-gap); color: var(--gap); }
+.chip--ai { background: var(--tint-ai); color: var(--ai); }
+.chip--human { background: var(--tint-human); color: var(--human); }
+.chip--neutral { background: var(--muted-fill); color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.callout { max-width: 76ch; padding: 12px 16px; border-left: 4px solid var(--gap); background: var(--tint-gap); border-radius: 0 var(--radius) var(--radius) 0; font-size: 15px; }
+.callout--ok { border-color: var(--ok); background: var(--tint-ok); }
+.callout--human { border-color: var(--human); background: var(--tint-human); }
+.callout strong:first-child { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
+
+.table-wrap { overflow-x: auto; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--card); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font: 700 11.5px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); background: var(--muted-fill); white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+tr.is-key td { background: var(--tint-gap); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--card); max-width: 100%; }
+.seg button { font: 600 13px var(--f-body); border: 0; background: transparent; color: var(--ink-soft); padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+[data-switch], [data-filter], [data-explorer] { display: grid; gap: 12px; min-width: 0; }
+/* Grid children default to min-width:auto, which lets a wide table stretch the page; keep them shrinkable. */
+main > section > *, [data-switch] > *, [data-filter] > *, [data-explorer] > *, .scenario > *, .split > * { min-width: 0; }
+
+.code { font: 13px/1.65 var(--f-mono); background: var(--ink); color: var(--paper); padding: 14px 16px; border-radius: var(--radius); overflow-x: auto; white-space: pre; margin: 0; }
+
+/* Explorer: lanes of selectable items + a detail panel */
+.lanes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; }
+.lane { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 7px; align-content: start; }
+.lane--core { border: 2px solid var(--ink); background: var(--card); }
+.lane__title { font: 700 11.5px var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); }
+.lane--core .lane__title { color: var(--accent); }
+.lane--flow > button:not(:last-of-type)::after { content: "↓"; color: var(--ink-soft); font-weight: 400; }
+.item {
+  font: 600 14px var(--f-body); color: var(--ink); text-align: left; cursor: pointer;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; padding: 8px 10px;
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+}
+.item small { font: 11.5px var(--f-mono); color: var(--ink-soft); }
+.item:hover { border-color: var(--ink); }
+.item[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.item--ai { color: var(--ai); border-color: var(--ai); }
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.strip div { font: 12px var(--f-mono); color: var(--ink-soft); border: 1.5px solid var(--line); border-radius: 4px; padding: 8px 10px; background: var(--card); }
+.detail { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); padding: 16px 20px; display: grid; gap: 10px 24px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.detail > h3, .detail > .full { grid-column: 1 / -1; }
+.detail dl { margin: 0; }
+.detail dt { font: 700 11px var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); }
+.detail dd { margin: 2px 0 0; font-size: 15px; }
+
+/* Sequences */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; counter-reset: s; }
+.steps > div { background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; padding: 12px; display: grid; gap: 4px; counter-increment: s; align-content: start; }
+.steps > div::before { content: counter(s); font: 700 12px var(--f-mono); color: var(--accent); }
+.steps b { font-family: var(--f-display); font-weight: 400; font-size: 22px; line-height: 1; }
+.steps small { color: var(--ink-soft); font-size: 13px; }
+.ladder { display: grid; gap: 6px; }
+.rung { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding: 10px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; font-size: 14.5px; }
+.rung b { font-family: var(--f-display); font-weight: 400; font-size: 21px; line-height: 1.05; }
+.rung span { color: var(--ink-soft); }
+.rung--trap { border-color: var(--gap); background: var(--tint-gap); }
+.rung--trap b { color: var(--gap); }
+.routes { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px 12px; align-items: center; }
+.routes .from { font-weight: 600; padding: 8px 12px; border-radius: 4px; background: var(--tint-gap); color: var(--gap); font-size: 14.5px; }
+.routes .arrow { font-family: var(--f-mono); color: var(--ink-soft); }
+.routes .to { padding: 8px 12px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--card); font-size: 14.5px; }
+.timeline { display: grid; border-left: 3px solid var(--line); margin-left: 8px; }
+.phase { position: relative; padding: 0 0 18px 24px; display: grid; gap: 4px; }
+.phase::before { content: ""; position: absolute; left: -9.5px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); border: 3px solid var(--ink-soft); }
+.phase--key::before { background: var(--accent); border-color: var(--accent); }
+.phase b { font-family: var(--f-display); font-weight: 400; font-size: 24px; line-height: 1; }
+.phase .meta { font: 12px var(--f-mono); color: var(--ink-soft); }
+.phase p { font-size: 14.5px; max-width: 74ch; }
+.phase .exit { color: var(--ok); font-weight: 600; }
+.tuple { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 13.5px var(--f-mono); }
+.tuple span { border: 1.5px solid var(--line); background: var(--card); padding: 6px 10px; border-radius: 4px; }
+.tuple em { font-style: normal; color: var(--ink-soft); }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.variant { display: grid; gap: 3px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--paper); }
+.variant b { font-size: 14.5px; }
+.variant small { color: var(--ink-soft); font: 12px var(--f-mono); }
+.scenario { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }
+.scenario ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; }
+.questions { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 80ch; counter-reset: q; }
+.questions li { display: grid; grid-template-columns: 32px 1fr; gap: 6px; counter-increment: q; font-size: 15px; }
+.questions li::before { content: "Q" counter(q); font: 700 12px var(--f-mono); color: var(--human); padding-top: 3px; }
+
+/* ---------- 6. RESPONSIVE ---------- */
+@media (max-width: 1000px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .toc { position: static; max-height: none; }
+  .toc ol { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .hero, .lanes, .scenario { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .split, .detail { grid-template-columns: minmax(0, 1fr); }
+  .rung { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .routes { grid-template-columns: minmax(0, 1fr); }
+  .routes .arrow { display: none; }
+  .routes .to { margin-bottom: 8px; }
+  .keyfig__num { font-size: 52px; }
+}
+
+/* ---------- 7. PAGE-SPECIFIC STYLES (add below; tokens only) ---------- */
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div>
+    <p class="eyebrow">{{Document type · context}}</p>
+    <h1>{{Subject Name}}</h1>
+    <p class="hero__lede">{{The thesis of the source in 2–3 sentences: what is recommended, and why.}}</p>
+    <div class="hero__links">
+      <!-- Keep only when an educational companion exists (both mode). -->
+      <a class="companion" href="{{companion-explainer}}.html">Start with the visual explainer →</a>
+      <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+    </div>
+  </div>
+  <!-- Key figure: the one number that justifies the whole document. Remove if the source has none. -->
+  <div class="keyfig" aria-label="{{key figure description}}">
+    <div class="keyfig__row"><span class="keyfig__num">{{64 / 84}}</span><span>{{what the number counts}}</span></div>
+    <div class="keyfig__units" data-units="{{84}}" data-on="{{20}}" aria-hidden="true"></div>
+    <small>{{Context sentence. Source: name, date.}}</small>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <p class="eyebrow">Contents</p>
+    <ol id="toc"><!-- built from sections --></ol>
+  </nav>
+
+  <main>
+    <!-- One <section> per source section, in source order. data-n = the source's own number; data-title = short contents label. -->
+    <section id="summary" data-n="1" data-title="{{Summary}}">
+      <div class="sec-head"><p class="eyebrow">1 · {{Source section name}}</p><h2>{{Plain-language claim of this section}}</h2></div>
+      <div class="prose"><p>{{Two to four sentences of context.}}</p></div>
+      <!-- Compose with components from reference-components.html -->
+    </section>
+  </main>
+</div>
+
+<footer>
+  <p>{{Summarized from "Source title".}}</p>
+  <p>{{Evidence note: where the source is strong, where it is thin.}}</p>
+  <!-- Data conflicts found in the source go here, plainly stated. Remove if none. -->
+  <p>{{Note on any internal inconsistency in the source, and which figure this page uses.}}</p>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // Theme toggle (per-viewer convenience; storage may be unavailable)
+  try { const t = localStorage.getItem('rg-theme'); if (t) root.dataset.theme = t; } catch (_) {}
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('rg-theme', root.dataset.theme); } catch (_) {}
+  });
+
+  // Key-figure unit grid: data-units total, data-on highlighted
+  $$('[data-units]').forEach(g => {
+    const n = +g.dataset.units || 0, on = +g.dataset.on || 0;
+    for (let i = 0; i < n; i++) { const c = document.createElement('i'); if (i < on) c.className = 'on'; g.appendChild(c); }
+  });
+
+  // Contents rail with active-section tracking
+  const toc = document.getElementById('toc');
+  const sections = $$('main > section[id]');
+  const links = sections.map((s, i) => {
+    const li = document.createElement('li'), a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.innerHTML = '<span class="n"></span><span class="t"></span>';
+    a.querySelector('.n').textContent = s.dataset.n || i + 1;
+    a.querySelector('.t').textContent = s.dataset.title || s.querySelector('h2')?.textContent || s.id;
+    li.appendChild(a); toc.appendChild(li); return a;
+  });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.hash === '#' + e.target.id));
+  }), { rootMargin: '-25% 0px -65% 0px' });
+  sections.forEach(s => io.observe(s));
+
+  // Generic one-of-many selector used by switchers ([data-switch]) and explorers ([data-explorer]):
+  // buttons carry data-key; panels carry data-panel="key". The pressed button's panel shows.
+  const wireSelect = (box, btnSel) => {
+    const btns = $$(btnSel, box), panels = $$('[data-panel]', box);
+    const show = key => {
+      btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.key === key ? 'true' : 'false'));
+      panels.forEach(p => { p.hidden = p.dataset.panel !== key; });
+    };
+    btns.forEach(b => b.addEventListener('click', () => show(b.dataset.key)));
+    const first = btns.find(b => b.getAttribute('aria-pressed') === 'true') || btns[0];
+    if (first) show(first.dataset.key);
+  };
+  $$('[data-switch]').forEach(box => wireSelect(box, '.seg button[data-key]'));
+  $$('[data-explorer]').forEach(box => wireSelect(box, '.item[data-key]'));
+
+  // Filters: buttons carry data-f ("all" or a tag); rows/items carry data-tags="tag tag".
+  $$('[data-filter]').forEach(box => {
+    const btns = $$('.seg button[data-f]', box), rows = $$('[data-tags]', box);
+    const allBtn = btns.find(b => b.dataset.f === 'all');
+    if (allBtn && allBtn.textContent.includes('{n}')) allBtn.textContent = allBtn.textContent.replace('{n}', rows.length);
+    const apply = f => {
+      btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.f === f ? 'true' : 'false'));
+      rows.forEach(r => { r.hidden = !(f === 'all' || r.dataset.tags.split(/\s+/).includes(f)); });
+    };
+    btns.forEach(b => b.addEventListener('click', () => apply(b.dataset.f)));
+    apply('all');
+  });
+})();
+</script>
+</body>
+</html>

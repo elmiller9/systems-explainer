@@ -1,0 +1,59 @@
+/* ============================================================
+   SHARED DESIGN TOKENS — systems-explainer plugin
+   Single source of truth for color and type in BOTH page types
+   (blueprint explainer + reference guide). Edit here, then run:
+       python scripts/sync_tokens.py
+   which copies this block between the TOKENS:BEGIN / TOKENS:END
+   markers in every template. Never edit those blocks in place.
+   ============================================================ */
+:root {
+  /* Surfaces + ink */
+  --paper: #F3EBE0;        /* page background, warm cream */
+  --card: #FFFDF8;         /* boxes, nodes, table bodies */
+  --ink: #222222;          /* text, lines, borders (never pure black) */
+  --ink-soft: #5B5550;     /* secondary text */
+  --rule: #CFC4B4;         /* hairlines, guides */
+  --grid-dot: #E2D7C6;     /* blueprint dot grid */
+  --muted-fill: #E8DFD2;   /* grayed-out / wrong-path fill, table header fill */
+
+  /* Accent family */
+  --accent: #C55A44;       /* terracotta: the one thing to notice */
+  --accent-2: #D97746;     /* burnt orange: 2nd series */
+  --accent-3: #8C3B2D;     /* deep brick: 3rd series */
+  --olive: #6F7F4E;        /* good / allowed / works */
+  --slate: #4E6A80;        /* neutral system element, 4th series */
+  --ochre: #9A6A12;        /* human decision / judgment */
+  --on-accent: #FFFDF8;    /* text on accent fills */
+
+  /* Semantic roles (reference guide chips, callouts, explainer status) */
+  --ok: var(--olive);      /* verified, eliminated, allowed */
+  --gap: var(--accent);    /* gap, risk, trap, forbidden */
+  --ai: var(--slate);      /* AI-assisted */
+  --human: var(--ochre);   /* human decision */
+  --tint-ok: color-mix(in srgb, var(--olive) 16%, var(--card));
+  --tint-gap: color-mix(in srgb, var(--accent) 14%, var(--card));
+  --tint-ai: color-mix(in srgb, var(--slate) 15%, var(--card));
+  --tint-human: color-mix(in srgb, var(--ochre) 15%, var(--card));
+
+  /* Type families (load via the Google Fonts link in each template) */
+  --f-display: "Bebas Neue", Anton, "Arial Narrow", sans-serif;
+  --f-mono: "Space Mono", "Courier Prime", ui-monospace, monospace;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+    --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+    --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+    --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+  --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+  --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+  --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+  color-scheme: dark;
+}

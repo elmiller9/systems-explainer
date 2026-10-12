@@ -1,0 +1,324 @@
+<!--
+  COMPONENT LIBRARY — systems-explainer / blueprint-explainer
+  ============================================================
+  Copy a snippet into a zone's <figure class="zone__figure"> in template.html,
+  then replace the {{PLACEHOLDERS}}. All styling comes from template.html classes.
+
+  Rules that keep components working:
+  - Every element with class "draw" needs pathLength="1" (the draw-in animation depends on it).
+  - Don't combine "draw" with "d-line--dashed" (they share stroke-dasharray). Dashed lines use "pop" or nothing.
+  - Arrowheads: add class "arrow" (ink) or "arrow-accent". They appear after the draw-in finishes.
+  - Stagger with style="--i:N" (N = 0,1,2… in reading order).
+  - Write SVG labels in ALL CAPS yourself (SVG text-transform is unreliable).
+  - Keep SVG label font-size ≥ 13 (the d-label--sm size). Max ~9 nodes per diagram.
+  - Never put hex colors in the markup. Use the d-* classes, which read the tokens.
+  - Labels inside 180–240px-wide nodes hold ~16–20 characters. Shorten words rather than shrinking the type.
+
+  INDEX
+  SVG:  S1 Fan-out · S2 Pipeline · S3 Timeline · S4 Logic gate · S5 Routing branch · S6 Loop/cycle
+        S7 Shelves (build order) · S8 Doors + permissions · S9 Folder in 3 zones · S10 Gauge + stamp
+        S11 Synthesis lines · S12 Flat vs compounding · S13 Drop into GONE
+  HTML: H1 Compare (without/with) · H2 Vocabulary trio · H3 Chat correction · H4 Terminal asset
+        H5 File tree (proof) · H6 Recipe card (needs/steps/checks) · H7 Review queue · H8 Guardrails
+-->
+
+
+<!-- ================= S1 FAN-OUT (one source → many outputs). Use for the hook and the loop-back. =================
+     See zone 01 in template.html: source box, accent bracket path, 5 stacked boxes. -->
+
+
+<!-- ================= S2 PIPELINE (A → B → C → D) ================= -->
+<svg viewBox="0 0 960 260" role="img" aria-label="{{Pipeline from A to D}}">
+  <g class="pop" style="--i:0"><rect class="d-node" x="30" y="90" width="180" height="80" rx="8"/><text class="d-label" x="120" y="136" text-anchor="middle">{{STEP A}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:1" d="M210,130 H262"/>
+  <g class="pop" style="--i:2"><rect class="d-node" x="270" y="90" width="180" height="80" rx="8"/><text class="d-label" x="360" y="136" text-anchor="middle">{{STEP B}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:3" d="M450,130 H502"/>
+  <g class="pop" style="--i:4"><rect class="d-node" x="510" y="90" width="180" height="80" rx="8"/><text class="d-label" x="600" y="136" text-anchor="middle">{{STEP C}}</text></g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:5" d="M690,130 H742"/>
+  <g class="pop" style="--i:6"><rect class="d-shadow" x="756" y="96" width="180" height="80" rx="8"/><rect class="d-node--accent" x="750" y="90" width="180" height="80" rx="8"/><text class="d-label d-label--on-accent" x="840" y="136" text-anchor="middle">{{RESULT}}</text></g>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="120" y="200" text-anchor="middle">{{caption}}</text>
+</svg>
+
+
+<!-- ================= S3 TIMELINE (anti-pattern story: last node = the cost) ================= -->
+<svg viewBox="0 0 960 300" role="img" aria-label="{{Timeline of how it went wrong}}">
+  <path class="d-line draw" pathLength="1" style="--i:0" d="M60,150 H900"/>
+  <g class="pop" style="--i:2"><circle class="d-node" cx="140" cy="150" r="14"/><text class="d-title" x="140" y="112" text-anchor="middle">{{DAY 1}}</text><text class="d-label d-label--sm" x="140" y="196" text-anchor="middle">{{the small mistake}}</text></g>
+  <g class="pop" style="--i:4"><circle class="d-node" cx="480" cy="150" r="14"/><text class="d-title" x="480" y="112" text-anchor="middle">{{DAY 2}}</text><text class="d-label d-label--sm" x="480" y="196" text-anchor="middle">{{nobody catches it}}</text></g>
+  <g class="pop" style="--i:6"><circle class="d-node--accent" cx="820" cy="150" r="16"/><text class="d-title d-title--accent" x="820" y="112" text-anchor="middle">{{DAY 5}}</text><text class="d-label d-label--sm" x="820" y="196" text-anchor="middle">{{the damage spreads}}</text></g>
+  <text class="d-title d-title--accent stamp" style="--i:7" x="820" y="262" text-anchor="middle">{{THE COST}}</text>
+</svg>
+
+
+<!-- ================= S4 LOGIC GATE (rule that filters what passes) ================= -->
+<svg viewBox="0 0 960 400" role="img" aria-label="{{Decision gate}}">
+  <g class="pop" style="--i:0"><rect class="d-node" x="40" y="140" width="200" height="80" rx="8"/><text class="d-label" x="140" y="186" text-anchor="middle">{{INPUT}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:1" d="M240,180 H370"/>
+  <g class="pop" style="--i:2">
+    <polygon class="d-node" points="480,80 580,180 480,280 380,180"/>
+    <text class="d-label d-label--sm" x="480" y="172" text-anchor="middle">{{THE QUESTION}}</text>
+    <text class="d-label d-label--sm" x="480" y="194" text-anchor="middle">{{IT ASKS?}}</text>
+  </g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:3" d="M580,180 H692"/>
+  <text class="d-label d-label--accent pop" style="--i:4" x="606" y="166">YES</text>
+  <g class="pop" style="--i:4"><rect class="d-node" x="700" y="140" width="220" height="80" rx="8"/><text class="d-label d-label--accent" x="810" y="186" text-anchor="middle">{{KEEP IT}}</text></g>
+  <path class="d-line d-line--soft draw arrow" pathLength="1" style="--i:5" d="M480,280 V314"/>
+  <text class="d-label d-label--soft pop" style="--i:6" x="494" y="306">NO</text>
+  <g class="pop" style="--i:6"><rect class="d-node--muted" x="390" y="322" width="180" height="56" rx="8"/><text class="d-label d-label--soft" x="480" y="356" text-anchor="middle">{{DROP IT}}</text></g>
+</svg>
+
+
+<!-- ================= S5 ROUTING BRANCH (right path accent, wrong path grayed) ================= -->
+<svg viewBox="0 0 960 360" role="img" aria-label="{{Where the lesson should go}}">
+  <g class="pop" style="--i:0"><rect class="d-node" x="40" y="140" width="200" height="80" rx="8"/><text class="d-label" x="140" y="186" text-anchor="middle">{{THE INPUT}}</text></g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:1" d="M240,180 H330 V90 H642"/>
+  <path class="d-line d-line--soft draw arrow" pathLength="1" style="--i:1" d="M330,180 V270 H642"/>
+  <g class="pop" style="--i:3"><rect class="d-shadow" x="656" y="56" width="260" height="80" rx="8"/><rect class="d-node" x="650" y="50" width="260" height="80" rx="8"/><text class="d-label d-label--accent" x="780" y="88" text-anchor="middle">{{RIGHT PLACE}}</text><text class="d-label d-label--sm d-label--soft" x="780" y="112" text-anchor="middle">{{why it works}}</text></g>
+  <g class="pop" style="--i:4"><rect class="d-node--muted" x="650" y="230" width="260" height="80" rx="8"/><text class="d-label d-label--soft" x="780" y="268" text-anchor="middle">{{WRONG PLACE}}</text><text class="d-label d-label--sm d-label--soft" x="780" y="292" text-anchor="middle">{{why it fails}}</text></g>
+</svg>
+
+
+<!-- ================= S6 LOOP / CYCLE (4 stations, clockwise) ================= -->
+<svg viewBox="0 0 960 540" role="img" aria-label="{{Four-step loop}}">
+  <text class="d-title d-title--accent pop" style="--i:0" x="480" y="282" text-anchor="middle">{{THE LOOP}}</text>
+  <g class="pop" style="--i:1"><rect class="d-node--accent" x="390" y="44" width="180" height="52" rx="8"/><text class="d-label d-label--on-accent" x="480" y="76" text-anchor="middle">1 {{STEP}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:2" d="M586,100 A200,200 0 0 1 661,185"/>
+  <g class="pop" style="--i:3"><rect class="d-node" x="590" y="244" width="180" height="52" rx="8"/><text class="d-label" x="680" y="276" text-anchor="middle">2 {{STEP}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:4" d="M661,355 A200,200 0 0 1 586,440"/>
+  <g class="pop" style="--i:5"><rect class="d-node" x="390" y="444" width="180" height="52" rx="8"/><text class="d-label" x="480" y="476" text-anchor="middle">3 {{STEP}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:6" d="M374,440 A200,200 0 0 1 299,355"/>
+  <g class="pop" style="--i:7"><rect class="d-node" x="190" y="244" width="180" height="52" rx="8"/><text class="d-label" x="280" y="276" text-anchor="middle">4 {{STEP}}</text></g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:8" d="M299,185 A200,200 0 0 1 374,100"/>
+</svg>
+
+
+<!-- ================= S7 SHELVES (build order, bottom-up) ================= -->
+<!-- Shelf i (0 = bottom) uses y = 440 − i·88. Copy one <g> per layer. Highlight the current layer with d-node--accent on its front face. -->
+<svg viewBox="0 0 960 540" role="img" aria-label="{{Five layers built bottom-up}}">
+  <g class="pop" style="--i:0">
+    <polygon class="d-node" points="300,440 340,406 700,406 660,440"/><polygon class="d-node" points="660,440 700,406 700,430 660,464"/><rect class="d-node" x="300" y="440" width="360" height="24"/>
+    <text class="d-label" x="280" y="458" text-anchor="end">{{LAYER ONE}}</text><text class="d-title d-title--accent" x="730" y="452">01</text></g>
+  <g class="pop" style="--i:1">
+    <polygon class="d-node" points="300,352 340,318 700,318 660,352"/><polygon class="d-node" points="660,352 700,318 700,342 660,376"/><rect class="d-node" x="300" y="352" width="360" height="24"/>
+    <text class="d-label" x="280" y="370" text-anchor="end">{{LAYER TWO}}</text><text class="d-title d-title--accent" x="730" y="364">02</text></g>
+  <g class="pop" style="--i:2">
+    <polygon class="d-node" points="300,264 340,230 700,230 660,264"/><polygon class="d-node" points="660,264 700,230 700,254 660,288"/><rect class="d-node" x="300" y="264" width="360" height="24"/>
+    <text class="d-label" x="280" y="282" text-anchor="end">{{LAYER THREE}}</text><text class="d-title d-title--accent" x="730" y="276">03</text></g>
+  <g class="pop" style="--i:3">
+    <polygon class="d-node" points="300,176 340,142 700,142 660,176"/><polygon class="d-node" points="660,176 700,142 700,166 660,200"/><rect class="d-node" x="300" y="176" width="360" height="24"/>
+    <text class="d-label" x="280" y="194" text-anchor="end">{{LAYER FOUR}}</text><text class="d-title d-title--accent" x="730" y="188">04</text></g>
+  <g class="pop" style="--i:4">
+    <polygon class="d-node" points="300,88 340,54 700,54 660,88"/><polygon class="d-node" points="660,88 700,54 700,78 660,112"/><rect class="d-node--accent" x="300" y="88" width="360" height="24"/>
+    <text class="d-label" x="280" y="106" text-anchor="end">{{LAYER FIVE}}</text><text class="d-title d-title--accent" x="730" y="100">05</text></g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:5" d="M850,480 V60"/>
+  <text class="d-label d-label--sm d-label--accent pop" style="--i:6" x="870" y="270" transform="rotate(-90 870 270)" text-anchor="middle">BUILD IN THIS ORDER</text>
+</svg>
+
+
+<!-- ================= S8 DOORS + PERMISSIONS (access to tools) ================= -->
+<svg viewBox="0 0 960 540" role="img" aria-label="{{Two tools with different permissions}}">
+  <rect class="d-line d-line--soft d-line--dashed pop" style="--i:0" x="70" y="30" width="820" height="480" rx="10"/>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:0" x="90" y="58">{{WHAT IT CAN TOUCH}}</text>
+  <g class="pop" style="--i:1">
+    <rect class="d-node" x="140" y="80" width="260" height="410" rx="4"/><circle class="d-node--ink" cx="372" cy="300" r="10"/>
+    <rect class="d-node" x="170" y="104" width="200" height="40" rx="4"/><text class="d-label" x="270" y="130" text-anchor="middle">{{TOOL ONE}}</text>
+  </g>
+  <g class="pop" style="--i:2">
+    <rect class="d-shadow" x="174" y="184" width="200" height="164"/><rect class="d-node" x="170" y="180" width="200" height="164"/>
+    <text class="d-label d-label--sm d-label--soft" x="186" y="208">{{ACCESS}}</text>
+    <text class="d-label" x="186" y="244">✓ {{ALLOWED}}</text>
+    <text class="d-label" x="186" y="280">✓ {{ALLOWED}}</text>
+    <text class="d-label d-label--accent" x="186" y="316">✗ {{FORBIDDEN}}</text>
+  </g>
+  <g class="pop" style="--i:3">
+    <rect class="d-node" x="560" y="80" width="260" height="410" rx="4"/><circle class="d-node--ink" cx="792" cy="300" r="10"/>
+    <rect class="d-node" x="590" y="104" width="200" height="40" rx="4"/><text class="d-label" x="690" y="130" text-anchor="middle">{{TOOL TWO}}</text>
+  </g>
+  <g class="stamp" style="--i:4">
+    <circle class="d-node--accent" cx="690" cy="262" r="66"/>
+    <text class="d-label d-label--on-accent" x="690" y="256" text-anchor="middle">READ</text>
+    <text class="d-label d-label--on-accent" x="690" y="280" text-anchor="middle">ONLY</text>
+  </g>
+</svg>
+
+
+<!-- ================= S9 FOLDER IN 3 ZONES (raw → organized → index) ================= -->
+<svg viewBox="0 0 960 540" role="img" aria-label="{{One folder with three areas}}">
+  <g class="pop" style="--i:0">
+    <path class="d-node" d="M60,90 V70 a8,8 0 0 1 8,-8 H250 l24,28 Z"/>
+    <rect class="d-shadow" x="66" y="96" width="840" height="410" rx="8"/><rect class="d-node" x="60" y="90" width="840" height="410" rx="8"/>
+  </g>
+  <path class="d-line d-line--soft d-line--dashed pop" style="--i:1" d="M350,110 V480 M650,110 V480"/>
+  <text class="d-label d-label--accent pop" style="--i:1" x="80" y="132">1 {{RAW}}</text>
+  <text class="d-label d-label--accent pop" style="--i:1" x="370" y="132">2 {{ORGANIZED}}</text>
+  <text class="d-label d-label--accent pop" style="--i:1" x="670" y="132">3 {{THE INDEX}}</text>
+  <g class="pop" style="--i:2"><rect class="d-node" x="90" y="170" width="200" height="56" rx="4"/><text class="d-label d-label--sm" x="106" y="204">{{raw-file-1}}</text></g>
+  <g class="pop" style="--i:2"><rect class="d-node" x="90" y="260" width="200" height="56" rx="4"/><text class="d-label d-label--sm" x="106" y="294">{{raw-file-2}}</text></g>
+  <g class="pop" style="--i:2"><rect class="d-node" x="90" y="350" width="200" height="56" rx="4"/><text class="d-label d-label--sm" x="106" y="384">{{raw-file-3}}</text></g>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:3" d="M290,198 H322 V230 H392"/>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:4" d="M290,288 H322 V330 H392"/>
+  <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:5" d="M290,378 H322 V330"/>
+  <g class="pop" style="--i:6"><rect class="d-node" x="400" y="200" width="210" height="60" rx="8"/><text class="d-label" x="505" y="236" text-anchor="middle">{{TOPIC A}}</text></g>
+  <g class="pop" style="--i:6"><rect class="d-node" x="400" y="300" width="210" height="60" rx="8"/><text class="d-label" x="505" y="336" text-anchor="middle">{{TOPIC B}}</text></g>
+  <g class="pop" style="--i:7">
+    <rect class="d-node" x="680" y="170" width="190" height="236" rx="0"/>
+    <text class="d-label d-label--sm" x="696" y="206">· {{TOPIC A}}</text>
+    <text class="d-label d-label--sm" x="696" y="240">· {{TOPIC B}}</text>
+    <text class="d-label d-label--sm" x="696" y="274">· {{TOPIC C}}</text>
+    <text class="d-label d-label--sm" x="696" y="308">· {{TOPIC D}}</text>
+    <text class="d-label d-label--sm d-label--accent" x="696" y="384">{{READ FIRST}}</text>
+  </g>
+</svg>
+
+
+<!-- ================= S10 GAUGE + STAMP (autonomy / share of work) ================= -->
+<!-- Needle angle: value v (0–1) → point (300 + 150·cos(π − v·π), 300 − 150·sin(π − v·π)). 80% → (421,212). -->
+<svg viewBox="0 0 960 400" role="img" aria-label="{{Gauge reading 80 percent}}">
+  <path class="d-line draw" pathLength="1" style="--i:0; stroke-width:10" d="M120,300 A180,180 0 0 1 480,300"/>
+  <path class="d-line d-line--soft pop" style="--i:1" d="M120,300 H150 M300,120 V150 M480,300 H450 M173,173 L194,194 M427,173 L406,194"/>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:1" x="120" y="330" text-anchor="middle">0</text>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:1" x="480" y="330" text-anchor="middle">100</text>
+  <path class="d-line d-line--accent draw" pathLength="1" style="--i:2; stroke-width:6" d="M300,300 L421,212"/>
+  <circle class="d-node--ink pop" style="--i:2" cx="300" cy="300" r="14"/>
+  <text class="d-label pop" style="--i:3" x="300" y="370" text-anchor="middle">{{SHARE THAT RUNS ON ITS OWN}}</text>
+  <g class="stamp" style="--i:4">
+    <rect class="d-line d-line--accent" x="600" y="130" width="260" height="130" rx="10" style="stroke-width:6"/>
+    <text class="d-title d-title--accent" x="730" y="222" text-anchor="middle" style="font-size:84px">{{80%}}</text>
+  </g>
+</svg>
+
+
+<!-- ================= S11 SYNTHESIS LINES (every part → one real output) ================= -->
+<!-- One series color per counted part: accent, a2, a3, slate. Each tag says its name in text too. -->
+<svg viewBox="0 0 960 540" role="img" aria-label="{{How each part shapes one output}}">
+  <g class="pop" style="--i:0"><rect class="d-node--ink" x="230" y="24" width="500" height="60" rx="8"/><text class="d-label d-label--on-ink" x="480" y="60" text-anchor="middle">&gt; {{"ONE REAL REQUEST"}}</text></g>
+  <path class="d-line d-line--soft draw arrow" pathLength="1" style="--i:1" d="M480,84 V164"/>
+  <g class="pop" style="--i:2">
+    <rect class="d-shadow" x="406" y="176" width="510" height="340" rx="8"/><rect class="d-node" x="400" y="170" width="510" height="340" rx="8"/>
+    <text class="d-label d-label--sm d-label--soft" x="424" y="200">{{OUTPUT}}</text>
+    <text class="d-label" x="430" y="246">{{line shaped by part 1}}</text>
+    <text class="d-label" x="430" y="316">{{line shaped by part 2}}</text>
+    <text class="d-label" x="430" y="386">{{line shaped by part 3}}</text>
+    <text class="d-label" x="430" y="456">{{line shaped by part 4}}</text>
+  </g>
+  <g class="pop" style="--i:3"><rect class="d-node" x="30" y="220" width="180" height="40" rx="20" style="stroke:var(--accent)"/><text class="d-label d-label--sm" x="120" y="245" text-anchor="middle">{{PART 1}}</text></g>
+  <g class="pop" style="--i:3"><rect class="d-node" x="30" y="290" width="180" height="40" rx="20" style="stroke:var(--accent-2)"/><text class="d-label d-label--sm" x="120" y="315" text-anchor="middle">{{PART 2}}</text></g>
+  <g class="pop" style="--i:3"><rect class="d-node" x="30" y="360" width="180" height="40" rx="20" style="stroke:var(--accent-3)"/><text class="d-label d-label--sm" x="120" y="385" text-anchor="middle">{{PART 3}}</text></g>
+  <g class="pop" style="--i:3"><rect class="d-node" x="30" y="430" width="180" height="40" rx="20" style="stroke:var(--slate)"/><text class="d-label d-label--sm" x="120" y="455" text-anchor="middle">{{PART 4}}</text></g>
+  <path class="d-line d-line--accent draw" pathLength="1" style="--i:4" d="M210,240 H420"/>
+  <path class="d-line d-line--a2 draw" pathLength="1" style="--i:5" d="M210,310 H420"/>
+  <path class="d-line d-line--a3 draw" pathLength="1" style="--i:6" d="M210,380 H420"/>
+  <path class="d-line d-line--slate draw" pathLength="1" style="--i:7" d="M210,450 H420"/>
+</svg>
+
+
+<!-- ================= S12 FLAT vs COMPOUNDING ================= -->
+<svg viewBox="0 0 960 400" role="img" aria-label="{{Flat line versus compounding curve}}">
+  <path class="d-line d-line--soft pop" style="--i:0" d="M80,340 H900 M80,340 V40"/>
+  <path class="d-line d-line--soft draw" pathLength="1" style="--i:1" d="M80,290 H880"/>
+  <path class="d-line d-line--accent draw" pathLength="1" style="--i:2; stroke-width:4" d="M80,290 C480,286 700,230 880,60"/>
+  <text class="d-label d-label--soft pop" style="--i:4" x="880" y="318" text-anchor="end">{{NEVER CORRECTED}}</text>
+  <text class="d-label d-label--accent pop" style="--i:5" x="860" y="54" text-anchor="end">{{CORRECTED EVERY WEEK}}</text>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:3" x="80" y="370">{{WEEK 1}}</text>
+  <text class="d-label d-label--sm d-label--soft pop" style="--i:3" x="900" y="370" text-anchor="end">{{WEEK 12}}</text>
+</svg>
+
+
+<!-- ================= S13 DROP INTO "GONE" (volatile state evaporates) ================= -->
+<svg viewBox="0 0 960 400" role="img" aria-label="{{Temporary items disappear}}">
+  <g class="pop" style="--i:0"><rect class="d-node" x="80" y="60" width="240" height="56" rx="8"/><text class="d-label" x="100" y="94">{{MESSAGE HISTORY}}</text></g>
+  <g class="pop" style="--i:1"><rect class="d-node" x="80" y="150" width="240" height="56" rx="8"/><text class="d-label" x="100" y="184">{{SCRATCHPAD}}</text></g>
+  <g class="pop" style="--i:2"><rect class="d-node" x="80" y="240" width="240" height="56" rx="8"/><text class="d-label" x="100" y="274">{{PULLED-IN FILES}}</text></g>
+  <path class="d-line draw arrow" pathLength="1" style="--i:3" d="M320,88 H440 V250 H552"/>
+  <path class="d-line draw arrow" pathLength="1" style="--i:4" d="M320,178 H420 V290 H552"/>
+  <path class="d-line draw arrow" pathLength="1" style="--i:5" d="M320,268 H400 V330 H552"/>
+  <g class="stamp" style="--i:6"><rect class="d-node--ink" x="560" y="220" width="320" height="140" rx="8"/><text class="d-title" x="720" y="306" text-anchor="middle" style="fill:var(--paper);font-size:56px">GONE</text></g>
+  <text class="d-label d-label--sm d-label--accent pop" style="--i:7" x="720" y="390" text-anchor="middle">{{WHEN THE SESSION ENDS}}</text>
+</svg>
+
+
+<!-- ================= H1 COMPARE (without / with) ================= -->
+<div class="cards">
+  <div class="card card--muted pop" style="--i:0">
+    <p class="card__label">{{WITHOUT IT}}</p>
+    <p class="card__title">{{Starts from zero}}</p>
+    <p class="card__body">{{One line on what goes wrong.}}</p>
+  </div>
+  <div class="card card--accent pop" style="--i:1">
+    <p class="card__label">{{WITH IT}}</p>
+    <p class="card__title">{{Knows the job}}</p>
+    <p class="card__body">{{One line on what changes.}}</p>
+  </div>
+</div>
+
+
+<!-- ================= H2 VOCABULARY TRIO (three confused terms) ================= -->
+<div class="cards cards--baseline">
+  <div class="card pop" style="--i:0"><span class="card__icon" aria-hidden="true">▤</span><p class="card__title">{{TERM A}}</p><p class="card__body">{{One-line definition.}}</p><p class="card__foot">{{TINY TAKEAWAY}}</p></div>
+  <div class="card pop" style="--i:1"><span class="card__icon" aria-hidden="true">◉</span><p class="card__title">{{TERM B}}</p><p class="card__body">{{One-line definition.}}</p><p class="card__foot">{{TINY TAKEAWAY}}</p></div>
+  <div class="card card--accent pop" style="--i:2"><span class="card__icon" aria-hidden="true">▣</span><p class="card__title">{{TERM C}}</p><p class="card__body">{{One-line definition.}}</p><p class="card__foot">{{TINY TAKEAWAY}}</p></div>
+</div>
+
+
+<!-- ================= H3 CHAT CORRECTION ("that's all you do") ================= -->
+<div class="mock pop" style="--i:0">
+  <div class="mock__bar"><i></i><i></i><i></i><span>{{CONVERSATION}}</span></div>
+  <div class="mock__body">
+    <p class="msg msg--ai">{{Assistant's draft, one line.}}</p>
+    <p class="msg msg--me">{{The correction, exactly as you'd say it to a person.}}</p>
+    <p class="hand-note">↑ {{that's the whole step}}</p>
+  </div>
+</div>
+
+
+<!-- ================= H4 TERMINAL / COPYABLE ASSET ================= -->
+<div class="mock mock--terminal pop" style="--i:0">
+  <div class="mock__bar"><i></i><i></i><i></i><span>{{COPY THIS}}</span></div>
+  <div class="mock__body">
+    <div class="prompt">{{the exact prompt, command or setting}}</div>
+    <div class="out">{{what comes back, one line}}</div>
+  </div>
+</div>
+
+
+<!-- ================= H5 FILE TREE (real-world proof) ================= -->
+<div class="filetree">
+  <div class="pop" style="--i:0"><span class="filetree__head tag--red">{{OWNER A}}</span>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{2 KB}}</span></div>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{1 KB}}</span></div></div>
+  <div class="pop" style="--i:1"><span class="filetree__head tag--green">{{OWNER B}}</span>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{3 KB}}</span></div>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{4 KB}}</span></div></div>
+  <div class="pop" style="--i:2"><span class="filetree__head tag--blue">{{OWNER C}}</span>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{2 KB}}</span></div>
+    <div class="file"><span class="name">{{file.md}}</span><span class="size">{{1 KB}}</span></div></div>
+</div>
+
+
+<!-- ================= H6 RECIPE CARD (needs / steps / checks) ================= -->
+<div class="card recipe pop" style="--i:0">
+  <div class="stack">
+    <div><h4>{{What it needs}}</h4><ul><li>{{input}}</li><li>{{input}}</li></ul></div>
+    <div><h4>{{The steps}}</h4><ol><li>{{step}}</li><li>{{step}}</li><li>{{step}}</li></ol></div>
+  </div>
+  <div><h4>{{The checks}}</h4><ul class="checks"><li>{{check before handing back}}</li><li>{{check}}</li><li>{{check}}</li></ul></div>
+</div>
+
+
+<!-- ================= H7 REVIEW QUEUE (human stays on judgment) ================= -->
+<div class="mock pop" style="--i:0">
+  <div class="mock__bar"><i></i><i></i><i></i><span>{{TODAY'S QUEUE}}</span></div>
+  <div class="mock__body">
+    <div class="queue__row"><span>{{Item awaiting a decision}}</span><span class="pills"><span class="pill pill--accent">Approve</span><span class="pill">Edit</span><span class="pill">Skip</span></span></div>
+    <div class="queue__row"><span>{{Item awaiting a decision}}</span><span class="pills"><span class="pill pill--accent">Approve</span><span class="pill">Edit</span><span class="pill">Skip</span></span></div>
+    <div class="queue__row"><span>{{Item awaiting a decision}}</span><span class="pills"><span class="pill pill--accent">Approve</span><span class="pill">Edit</span><span class="pill">Skip</span></span></div>
+  </div>
+</div>
+
+
+<!-- ================= H8 GUARDRAILS (2–4 rules where humans stay in control) ================= -->
+<div class="cards">
+  <div class="card card--paper pop" style="--i:0"><span class="card__icon" aria-hidden="true">🔒︎</span><p class="card__title">{{RULE ONE}}</p><p class="card__body">{{One line.}}</p></div>
+  <div class="card card--paper pop" style="--i:1"><span class="card__icon" aria-hidden="true">✓</span><p class="card__title">{{RULE TWO}}</p><p class="card__body">{{One line.}}</p></div>
+  <div class="card card--paper pop" style="--i:2"><span class="card__icon" aria-hidden="true">⏸</span><p class="card__title">{{RULE THREE}}</p><p class="card__body">{{One line.}}</p></div>
+</div>

@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- TITLE: a 2–4 word name. DESCRIPTION: the one-sentence promise. -->
+<title>{{Short Name}}</title>
+<meta name="description" content="{{The promise in one sentence.}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* ============================================================
+   BLUEPRINT EXPLAINER TEMPLATE — systems-explainer plugin
+   Desktop-first (1280–1920px). Tokens → layout → zones → diagrams → motion.
+   Do not hard-code colors below the token blocks; use var(--token).
+   ============================================================ */
+
+/* ---------- 1. TOKENS ---------- */
+/* TOKENS:BEGIN — generated from shared/tokens.css by scripts/sync_tokens.py; do not edit here */
+/* ============================================================
+   SHARED DESIGN TOKENS — systems-explainer plugin
+   Single source of truth for color and type in BOTH page types
+   (blueprint explainer + reference guide). Edit here, then run:
+       python scripts/sync_tokens.py
+   which copies this block between the TOKENS:BEGIN / TOKENS:END
+   markers in every template. Never edit those blocks in place.
+   ============================================================ */
+:root {
+  /* Surfaces + ink */
+  --paper: #F3EBE0;        /* page background, warm cream */
+  --card: #FFFDF8;         /* boxes, nodes, table bodies */
+  --ink: #222222;          /* text, lines, borders (never pure black) */
+  --ink-soft: #5B5550;     /* secondary text */
+  --rule: #CFC4B4;         /* hairlines, guides */
+  --grid-dot: #E2D7C6;     /* blueprint dot grid */
+  --muted-fill: #E8DFD2;   /* grayed-out / wrong-path fill, table header fill */
+
+  /* Accent family */
+  --accent: #C55A44;       /* terracotta: the one thing to notice */
+  --accent-2: #D97746;     /* burnt orange: 2nd series */
+  --accent-3: #8C3B2D;     /* deep brick: 3rd series */
+  --olive: #6F7F4E;        /* good / allowed / works */
+  --slate: #4E6A80;        /* neutral system element, 4th series */
+  --ochre: #9A6A12;        /* human decision / judgment */
+  --on-accent: #FFFDF8;    /* text on accent fills */
+
+  /* Semantic roles (reference guide chips, callouts, explainer status) */
+  --ok: var(--olive);      /* verified, eliminated, allowed */
+  --gap: var(--accent);    /* gap, risk, trap, forbidden */
+  --ai: var(--slate);      /* AI-assisted */
+  --human: var(--ochre);   /* human decision */
+  --tint-ok: color-mix(in srgb, var(--olive) 16%, var(--card));
+  --tint-gap: color-mix(in srgb, var(--accent) 14%, var(--card));
+  --tint-ai: color-mix(in srgb, var(--slate) 15%, var(--card));
+  --tint-human: color-mix(in srgb, var(--ochre) 15%, var(--card));
+
+  /* Type families (load via the Google Fonts link in each template) */
+  --f-display: "Bebas Neue", Anton, "Arial Narrow", sans-serif;
+  --f-mono: "Space Mono", "Courier Prime", ui-monospace, monospace;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+    --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+    --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+    --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+  --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+  --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+  --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+  color-scheme: dark;
+}
+/* TOKENS:END */
+:root { --rail-w: 232px; --stroke: 3px; --radius: 8px; --shadow: 5px 5px 0 var(--ink); }
+
+/* ---------- 2. BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-snap-type: y proximity; scroll-behavior: auto; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--grid-dot) 1.2px, transparent 1.4px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+code, kbd { font-family: var(--f-mono); font-size: .9em; }
+.label {
+  font-family: var(--f-mono); font-size: 12.5px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+
+/* ---------- 3. RAIL (minimap) + PROGRESS ---------- */
+.rail {
+  position: fixed; inset: 0 auto 0 0; width: var(--rail-w);
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 28px 18px 20px;
+  background: var(--paper);
+  border-right: var(--stroke) solid var(--ink);
+  z-index: 10;
+}
+.rail__title {
+  font-family: var(--f-display); font-size: 28px; line-height: .95; letter-spacing: .01em;
+  margin: 0; padding-bottom: 14px; border-bottom: var(--stroke) solid var(--ink);
+}
+.rail__list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.rail__list a {
+  display: grid; grid-template-columns: 30px 1fr; align-items: baseline; gap: 6px;
+  padding: 6px 8px; margin: 0 -8px; border-radius: 6px;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+  text-decoration: none; color: var(--ink-soft);
+}
+.rail__list a .n { font-weight: 700; }
+.rail__list a:hover { color: var(--ink); background: var(--muted-fill); }
+.rail__list a[aria-current="true"] { color: var(--ink); background: var(--card); box-shadow: inset 4px 0 0 var(--accent); }
+.rail__list a[aria-current="true"] .n { color: var(--accent); }
+.rail__foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rail__foot .label { font-size: 11px; }
+.theme-btn {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px;
+  padding: 4px 10px; cursor: pointer;
+}
+.progress {
+  position: fixed; top: 0; left: var(--rail-w); right: 0; height: 4px;
+  background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); z-index: 11;
+}
+
+/* ---------- 4. ZONES ---------- */
+main { margin-left: var(--rail-w); }
+.zone {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+  gap: clamp(28px, 3.2vw, 64px);
+  align-items: center;
+  padding: clamp(36px, 6vh, 72px) clamp(32px, 4vw, 80px);
+  scroll-snap-align: start;
+  border-bottom: 2px dashed var(--rule);
+  position: relative;
+}
+.zone--flip { grid-template-columns: minmax(0, 62fr) minmax(0, 38fr); }
+.zone--flip .zone__text { order: 2; }
+.zone__head { margin-bottom: 18px; padding-bottom: 14px; border-bottom: var(--stroke) solid var(--ink); }
+.zone__num {
+  display: block; font-family: var(--f-display); color: var(--accent);
+  font-size: clamp(72px, 8vw, 124px); line-height: .82;
+}
+.zone__title {
+  font-family: var(--f-display); font-weight: 400; margin: 6px 0 0;
+  font-size: clamp(40px, 4.4vw, 72px); line-height: .95; letter-spacing: .005em;
+}
+.zone__lede { font-size: clamp(18px, 1.35vw, 21px); margin: 0 0 14px; max-width: 46ch; }
+.zone__points { list-style: none; margin: 0 0 20px; padding: 0; max-width: 48ch; }
+.zone__points li { position: relative; padding-left: 26px; margin: 8px 0; font-size: 17px; }
+.zone__points li::before {
+  content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 10px;
+  background: var(--accent); border: 2px solid var(--ink);
+}
+.aphorism {
+  margin: 8px 0 0; padding: 14px 18px; max-width: 46ch;
+  background: var(--card); border: var(--stroke) solid var(--ink); border-radius: 4px;
+  box-shadow: var(--shadow);
+  font-family: var(--f-display); font-size: clamp(24px, 2vw, 32px); line-height: 1.05; letter-spacing: .01em;
+}
+.aphorism::before { content: "RULE"; display: block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); margin-bottom: 4px; }
+
+.zone__figure { margin: 0; min-width: 0; }
+.zone__figure > svg { display: block; width: 100%; height: auto; max-height: 80vh; }
+.zone__figure figcaption { margin-top: 10px; }
+
+/* Wide zone: header row on top, full-width diagram below */
+.zone--wide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: center; }
+.zone--wide .zone__text { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 40px; align-items: end; }
+.zone--wide .zone__head { margin: 0; }
+.zone--wide .zone__lede { margin: 0; max-width: 64ch; }
+.zone--wide .zone__figure > svg { max-height: 62vh; }
+
+/* Statement zone: one big line */
+.zone--statement { grid-template-columns: minmax(0, 1fr); text-align: center; justify-items: center; }
+.statement {
+  font-family: var(--f-display); font-size: clamp(72px, 11vw, 180px); line-height: .88; margin: 0;
+}
+.statement em { font-style: normal; color: var(--accent); }
+
+/* Short laptop viewports (a 1366×768 screen leaves ~650–670px after browser chrome):
+   number sits beside the title, type and padding tighten so each zone fits one screen. */
+@media (min-width: 900px) and (max-height: 820px) {
+  .zone { padding-top: 26px; padding-bottom: 26px; column-gap: 48px; }
+  .zone__head { display: flex; align-items: flex-end; gap: 18px; margin-bottom: 14px; padding-bottom: 10px; }
+  .zone__num { font-size: 68px; }
+  .zone__title { font-size: clamp(34px, 3.3vw, 48px); margin: 0; }
+  .zone__lede { font-size: 17px; margin-bottom: 10px; }
+  .zone__points { margin-bottom: 14px; }
+  .zone__points li { font-size: 15.5px; margin: 5px 0; }
+  .aphorism { font-size: 22px; padding: 10px 14px; }
+  .zone__figure > svg { max-height: 74vh; }
+  .zone--wide { row-gap: 18px; }
+  .zone--wide .zone__figure > svg { max-height: 58vh; }
+  .card { padding: 14px 16px; }
+  .card__title { font-size: 26px; }
+  .card__body { font-size: 15px; }
+}
+
+/* Companion link (both mode): put in the final zone's text, after the lede. */
+.companion-link {
+  display: inline-flex; margin-top: 16px; text-decoration: none; color: var(--ink);
+  font: 700 12.5px var(--f-mono); letter-spacing: .06em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 7px 16px; background: var(--card);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.companion-link:hover { color: var(--accent); border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+
+/* ---------- 5. DIAGRAM PRIMITIVES (SVG) ---------- */
+.d-node { fill: var(--card); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-node--accent { fill: var(--accent); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-node--muted { fill: var(--muted-fill); stroke: var(--ink-soft); stroke-width: 2; }
+.d-node--ink { fill: var(--ink); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-shadow { fill: var(--ink); stroke: none; }
+.d-line { fill: none; stroke: var(--ink); stroke-width: var(--stroke); stroke-linecap: round; stroke-linejoin: round; }
+.d-line--accent { stroke: var(--accent); }
+.d-line--a2 { stroke: var(--accent-2); }
+.d-line--a3 { stroke: var(--accent-3); }
+.d-line--slate { stroke: var(--slate); }
+.d-line--soft { stroke: var(--ink-soft); stroke-width: 2; }
+.d-line--dashed { stroke-dasharray: 8 7; }
+.d-label { font-family: var(--f-mono); font-size: 15px; letter-spacing: .06em; fill: var(--ink); }
+.d-label--sm { font-size: 13px; }
+.d-label--soft { fill: var(--ink-soft); }
+.d-label--accent { fill: var(--accent); font-weight: 700; }
+.d-label--on-accent { fill: var(--on-accent); font-weight: 700; }
+.d-label--on-ink { fill: var(--paper); font-weight: 700; }
+.d-title { font-family: var(--f-display); font-size: 34px; fill: var(--ink); }
+.d-title--accent { fill: var(--accent); }
+.d-arrowhead { fill: var(--ink); }
+.d-arrowhead--accent { fill: var(--accent); }
+.arrow { marker-end: url(#ah); }
+.arrow-accent { marker-end: url(#ah-accent); }
+
+/* ---------- 5b. HTML COMPONENTS (cards, mocks, file tree, recipe, queue) ---------- */
+.card {
+  background: var(--card); border: var(--stroke) solid var(--ink); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px 20px; min-width: 0;
+}
+.card--muted { background: var(--muted-fill); border-color: var(--ink-soft); box-shadow: none; color: var(--ink-soft); }
+.card--accent { border-color: var(--accent); box-shadow: 5px 5px 0 var(--accent); }
+.card--paper { border-radius: 0; }
+.card__label { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+.card__title { font-family: var(--f-display); font-size: 32px; line-height: 1; margin: 0 0 8px; font-weight: 400; }
+.card__body { margin: 0; font-size: 16px; }
+.card__foot {
+  margin-top: 12px; padding-top: 8px; border-top: 2px dashed var(--rule);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.card__icon { font-size: 22px; line-height: 1; margin-bottom: 8px; display: block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px; align-items: stretch; }
+.cards--baseline { padding-bottom: 22px; border-bottom: 2px dotted var(--ink-soft); }
+.strike { text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+.hl { color: var(--accent); font-weight: 600; }
+
+.mock { background: var(--card); border: var(--stroke) solid var(--ink); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.mock__bar {
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: var(--stroke) solid var(--ink);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+}
+.mock__bar i { width: 11px; height: 11px; border: 2px solid var(--ink); border-radius: 50%; display: inline-block; }
+.mock__bar span { margin-left: 8px; }
+.mock__body { padding: 16px 18px; }
+.msg { max-width: 82%; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 10px; margin: 10px 0; font-size: 16px; }
+.msg--ai { background: var(--muted-fill); }
+.msg--me { margin-left: auto; background: var(--card); border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+.hand-note { font-family: var(--f-mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); text-align: right; margin: 4px 0 0; }
+.mock--terminal .mock__body { background: var(--ink); color: var(--paper); font-family: var(--f-mono); font-size: 15px; line-height: 1.6; }
+.mock--terminal .prompt::before { content: "> "; color: var(--accent); font-weight: 700; }
+.mock--terminal .out { color: var(--rule); }
+
+.filetree { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+.filetree__head {
+  display: inline-block; font-family: var(--f-mono); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 4px 14px; margin-bottom: 6px; background: var(--card);
+}
+.tag--red { background: color-mix(in srgb, var(--accent) 24%, var(--card)); }
+.tag--green { background: color-mix(in srgb, var(--olive) 24%, var(--card)); }
+.tag--blue { background: color-mix(in srgb, var(--slate) 24%, var(--card)); }
+.file {
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+  border: 2px solid var(--ink); border-radius: 6px; background: var(--card); padding: 7px 10px; margin: 8px 0;
+  font-family: var(--f-mono); font-size: 13px;
+}
+.file::before { content: "▤"; color: var(--ink-soft); }
+.file .name { flex: 1; }
+.file .size { color: var(--ink-soft); font-size: 11px; }
+
+.recipe { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
+.recipe > div { padding: 16px 18px; }
+.recipe > div + div { border-left: var(--stroke) solid var(--ink); }
+.recipe .stack > * + * { border-top: 2px dashed var(--rule); margin-top: 12px; padding-top: 12px; }
+.recipe h4 { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.recipe ul, .recipe ol { margin: 0; padding-left: 20px; font-size: 15px; }
+.checks { list-style: none; padding-left: 0 !important; }
+.checks li { position: relative; padding-left: 26px; margin: 6px 0; }
+.checks li::before { content: ""; position: absolute; left: 0; top: .25em; width: 14px; height: 14px; border: 2px solid var(--ink); background: var(--card); }
+
+.checklist { list-style: none; margin: 0; padding: 0; font-family: var(--f-mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; }
+.checklist li { padding: 4px 0 4px 26px; position: relative; }
+.checklist li::before { position: absolute; left: 0; font-weight: 700; }
+.checklist .ok::before { content: "✓"; color: var(--olive); }
+.checklist .no { color: var(--accent); }
+.checklist .no::before { content: "✗"; }
+
+.queue__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 10px 0; border-bottom: 2px dashed var(--rule); font-size: 15px;
+}
+.queue__row:last-child { border-bottom: 0; }
+.pills { display: flex; gap: 6px; }
+.pill {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 3px 10px; background: var(--card); color: var(--ink);
+}
+.pill--accent { background: var(--accent); color: var(--on-accent); }
+
+/* ---------- 6. MOTION ---------- */
+/* Hidden states only apply when JS runs (html.js), so no-JS readers see everything. */
+.js .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.js .in-view .draw {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--i, 0) * 150ms + 150ms);
+}
+.js .zone:not(.settled) .draw.arrow,
+.js .zone:not(.settled) .draw.arrow-accent { marker-end: none; }
+
+.js .pop { opacity: 0; transform: scale(.86); transform-box: fill-box; transform-origin: center; }
+.js .in-view .pop {
+  opacity: 1; transform: none;
+  transition: opacity .35s ease-out, transform .35s cubic-bezier(.3,1.4,.5,1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+.js .stamp { opacity: 0; transform: translateY(-30px) rotate(-14deg) scale(1.3); transform-box: fill-box; transform-origin: center; }
+.js .in-view .stamp {
+  opacity: 1; transform: rotate(-6deg);
+  transition: opacity .2s ease-in, transform .28s cubic-bezier(.5,0,.75,0);
+  transition-delay: calc(var(--i, 0) * 110ms + 400ms);
+}
+.measuring .pop, .measuring .stamp { transform: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .js .draw { stroke-dasharray: none; stroke-dashoffset: 0; }
+  .js .pop, .js .stamp { opacity: 1; transform: none; }
+  .js .in-view .draw, .js .in-view .pop, .js .in-view .stamp { transition: none; }
+}
+
+/* ---------- 7. NARROW FALLBACK (< 900px) ---------- */
+@media (max-width: 899px) {
+  html { scroll-snap-type: none; }
+  .rail {
+    position: sticky; top: 0; inset: auto; width: auto; flex-direction: row; align-items: center;
+    padding: 10px 16px; gap: 12px; border-right: 0; border-bottom: var(--stroke) solid var(--ink);
+  }
+  .rail__title { font-size: 20px; border: 0; padding: 0; white-space: nowrap; }
+  .rail__list { display: flex; overflow-x: auto; gap: 4px; min-width: 0; }
+  .rail__list a { margin: 0; grid-template-columns: auto; white-space: nowrap; }
+  .rail__list a .t { display: none; }
+  .rail__foot .label { display: none; }
+  .progress { left: 0; }
+  main { margin-left: 0; }
+  .zone, .zone--wide { grid-template-columns: minmax(0, 1fr); min-height: auto; padding: 48px 16px; }
+  .zone--flip .zone__text { order: 0; }
+  .zone--wide .zone__text { display: block; }
+  .zone--wide .zone__lede { margin-top: 12px; }
+}
+
+/* ---------- 8. PAGE-SPECIFIC STYLES (add below; tokens only) ---------- */
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs: arrowheads used by every diagram (url(#ah), url(#ah-accent)). Keep this block. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path class="d-arrowhead" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+    <marker id="ah-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path class="d-arrowhead--accent" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+</svg>
+
+<nav class="rail" aria-label="Zones">
+  <p class="rail__title">{{SHORT NAME}}</p>
+  <ol class="rail__list" id="railList"><!-- filled from zones by script --></ol>
+  <div class="rail__foot">
+    <span class="label">↑ ↓ to step</span>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+</nav>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<main>
+
+  <!-- ===== ZONE 01 — HOOK (wide). This diagram returns, completed, in the final zone. ===== -->
+  <section class="zone zone--wide" id="z01" data-title="{{Hook title}}">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">01</span>
+        <h1 class="zone__title">{{HOOK TITLE}}</h1>
+      </header>
+      <p class="zone__lede">{{Hook line, 20 words or fewer. End with the count: "It's four pieces."}}</p>
+    </div>
+    <figure class="zone__figure">
+      <!-- Overview diagram: one source → bracket → N parts (swap for the arc's overview) -->
+      <svg viewBox="0 0 960 400" role="img" aria-labelledby="z01d">
+        <title id="z01d">{{Overview: source connects to N parts}}</title>
+        <g class="pop" style="--i:0">
+          <rect class="d-shadow" x="66" y="166" width="200" height="76" rx="8"/>
+          <rect class="d-node--accent" x="60" y="160" width="200" height="76" rx="8"/>
+          <text class="d-label d-label--on-accent" x="160" y="204" text-anchor="middle">{{SYSTEM}}</text>
+        </g>
+        <path class="d-line d-line--accent draw" pathLength="1" style="--i:1"
+              d="M260,198 H330 M330,62 V334 M330,62 H380 M330,130 H380 M330,198 H380 M330,266 H380 M330,334 H380"/>
+        <g class="pop" style="--i:3"><rect class="d-node" x="384" y="40" width="240" height="44" rx="8"/><text class="d-label" x="404" y="68">{{PART ONE}}</text></g>
+        <g class="pop" style="--i:4"><rect class="d-node" x="384" y="108" width="240" height="44" rx="8"/><text class="d-label" x="404" y="136">{{PART TWO}}</text></g>
+        <g class="pop" style="--i:5"><rect class="d-node" x="384" y="176" width="240" height="44" rx="8"/><text class="d-label" x="404" y="204">{{PART THREE}}</text></g>
+        <g class="pop" style="--i:6"><rect class="d-node" x="384" y="244" width="240" height="44" rx="8"/><text class="d-label" x="404" y="272">{{PART FOUR}}</text></g>
+        <g class="pop" style="--i:7"><rect class="d-node" x="384" y="312" width="240" height="44" rx="8"/><text class="d-label" x="404" y="340">{{PART FIVE}}</text></g>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:8" x="680" y="204">{{N PIECES · ONE SYSTEM}}</text>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- ===== STANDARD ZONE (split: text left, diagram right) ===== -->
+  <section class="zone" id="z02" data-title="{{Zone title}}">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">02</span>
+        <h2 class="zone__title">{{PIECE ONE: NAME}}</h2>
+      </header>
+      <p class="zone__lede">{{One or two sentences: what it is and what it feeds.}}</p>
+      <ul class="zone__points">
+        <li>{{Concrete point}}</li>
+        <li>{{Concrete point}}</li>
+        <li>{{Concrete point}}</li>
+      </ul>
+      <p class="aphorism">{{Original aphorism, 12 words or fewer.}}</p>
+    </div>
+    <figure class="zone__figure">
+      <!-- Paste a diagram from components.html here -->
+      <svg viewBox="0 0 960 540" role="img" aria-label="{{diagram description}}">
+        <g class="pop" style="--i:0"><rect class="d-node" x="80" y="230" width="220" height="80" rx="8"/><text class="d-label" x="190" y="276" text-anchor="middle">{{INPUT}}</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:1" d="M300,270 H640"/>
+        <g class="pop" style="--i:3"><rect class="d-shadow" x="656" y="236" width="220" height="80" rx="8"/><rect class="d-node" x="650" y="230" width="220" height="80" rx="8"/><text class="d-label d-label--accent" x="760" y="276" text-anchor="middle">{{OUTPUT}}</text></g>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- ===== STATEMENT ZONE (use at most twice) ===== -->
+  <section class="zone zone--statement" id="z03" data-title="{{Statement}}">
+    <div>
+      <p class="label">03</p>
+      <p class="statement">{{IT'S}} <em>{{FOUR.}}</em></p>
+    </div>
+  </section>
+
+  <!-- ===== FLIPPED ZONE (diagram left, text right) ===== -->
+  <section class="zone zone--flip" id="z04" data-title="{{Zone title}}">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">04</span>
+        <h2 class="zone__title">{{PIECE TWO: NAME}}</h2>
+      </header>
+      <p class="zone__lede">{{Lede}}</p>
+      <p class="aphorism">{{Aphorism}}</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 540" role="img" aria-label="{{diagram description}}"><!-- diagram --></svg>
+    </figure>
+  </section>
+
+  <!-- ===== FINAL ZONE — LOOP-BACK (wide): repeat the zone-01 diagram, fully labeled ===== -->
+  <section class="zone zone--wide" id="z99" data-title="{{Recap}}">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">{{NN}}</span>
+        <h2 class="zone__title">{{THE WHOLE SYSTEM}}</h2>
+      </header>
+      <p class="zone__lede">{{Recap the count and names. Then: "Start with piece one."}}</p>
+    </div>
+    <figure class="zone__figure"><!-- zone-01 diagram again, now with every part labeled/annotated --></figure>
+  </section>
+
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const zones = [...document.querySelectorAll('.zone')];
+
+  // Minimap rail: built from each zone's number + data-title
+  const list = document.getElementById('railList');
+  const links = zones.map((z, i) => {
+    const num = (z.querySelector('.zone__num, .label')?.textContent || String(i + 1).padStart(2, '0')).trim();
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + z.id;
+    a.innerHTML = '<span class="n"></span><span class="t"></span>';
+    a.querySelector('.n').textContent = num;
+    a.querySelector('.t').textContent = z.dataset.title || '';
+    a.addEventListener('click', e => { e.preventDefault(); go(i); });
+    li.appendChild(a); list.appendChild(li);
+    return a;
+  });
+
+  // Reveal: add .in-view once, then .settled after the draw-in finishes (shows arrowheads)
+  const reveal = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const z = en.target;
+      z.classList.add('in-view');
+      setTimeout(() => z.classList.add('settled'), reduce ? 0 : 1900);
+      reveal.unobserve(z);
+    });
+  }, { threshold: 0.22 });
+  zones.forEach(z => reveal.observe(z));
+
+  // Active zone: the one crossing the middle of the viewport
+  let current = 0;
+  const active = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      current = zones.indexOf(en.target);
+      links.forEach((a, i) => a.setAttribute('aria-current', i === current ? 'true' : 'false'));
+      links[current].scrollIntoView({ block: 'nearest' });
+    });
+  }, { rootMargin: '-48% 0px -48% 0px' });
+  zones.forEach(z => active.observe(z));
+
+  function go(i) {
+    i = Math.max(0, Math.min(zones.length - 1, i));
+    zones[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  // Keyboard stepping, like a camera stopping on each zone
+  addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest('input, textarea, select, button, [contenteditable]')) return;
+    const next = ['ArrowDown', 'ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !e.shiftKey);
+    const prev = ['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey);
+    if (next) { e.preventDefault(); go(current + 1); }
+    else if (prev) { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(zones.length - 1); }
+  });
+
+  // Fit each zone diagram's viewBox to its drawn content, so unused margins don't shrink the labels.
+  // Opt out per diagram with <svg data-fit="off">. Runs after fonts load (text width depends on them),
+  // with pop/stamp transforms neutralized so the measurement is the final, in-view size.
+  const fit = () => {
+    root.classList.add('measuring');
+    document.querySelectorAll('.zone__figure > svg:not([data-fit="off"])').forEach(svg => {
+      try {
+        const b = svg.getBBox(), pad = 14;
+        if (b.width && b.height) svg.setAttribute('viewBox', `${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`);
+      } catch (_) {}
+    });
+    root.classList.remove('measuring');
+  };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
+
+  // Progress bar
+  const bar = document.getElementById('progress');
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // Theme toggle (remembered per viewer; storage may be unavailable)
+  const btn = document.getElementById('themeBtn');
+  try { const t = localStorage.getItem('bp-theme'); if (t) root.dataset.theme = t; } catch (_) {}
+  if (btn) btn.addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('bp-theme', root.dataset.theme); } catch (_) {}
+  });
+})();
+</script>
+</body>
+</html>

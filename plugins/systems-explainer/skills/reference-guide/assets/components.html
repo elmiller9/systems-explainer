@@ -1,0 +1,183 @@
+<!--
+  REFERENCE COMPONENT LIBRARY — systems-explainer / reference-guide
+  ==================================================================
+  Copy a snippet into a <section> of reference-guide/assets/template.html and replace {{PLACEHOLDERS}}.
+  All styling comes from the template; interactivity comes from three generic hooks in its script:
+    [data-switch]   one-of-many panels chosen by .seg buttons (data-key ↔ data-panel)
+    [data-explorer] one-of-many detail panels chosen by .item buttons (data-key ↔ data-panel)
+    [data-filter]   rows/items with data-tags shown or hidden by .seg buttons (data-f)
+  Rules:
+  - Content lives in the markup, not in JS arrays, so the page is complete without script.
+  - Semantic chips mean one thing everywhere: ok = verified/eliminated/allowed, gap = gap/risk/trap,
+    ai = AI-assisted, human = human decision, neutral = everything else. Never use them as decoration.
+  - Every table sits in .table-wrap (it scrolls inside itself on narrow screens).
+  - Use the source's own terms, IDs, units and numbers. Don't round or rename them.
+
+  INDEX
+  R1 Decision cards        R2 Data table              R3 Switcher (tables / code / views)
+  R4 Filtered classified table                        R5 Explorer (lanes + detail)
+  R6 Steps (pipeline)      R7 Ladder / taxonomy with traps                    R8 Routes (A → B)
+  R9 Scenario selector     R10 Timeline / roadmap     R11 Callouts           R12 Code / interface
+  R13 Tuple + variants     R14 Open questions         R15 Status table (eliminated vs residual)
+-->
+
+
+<!-- ===== R1 DECISION CARDS — the source's core decisions or principles (3–6) ===== -->
+<div class="cards">
+  <div class="card"><b>{{Decision}}</b><p>{{One or two sentences: what and why.}}</p></div>
+  <div class="card"><b>{{Decision}}</b><p>{{…}}</p></div>
+  <div class="card"><b>{{Decision}}</b><p>{{…}}</p></div>
+</div>
+
+
+<!-- ===== R2 DATA TABLE — any tabular content from the source. Mark the row that matters with .is-key ===== -->
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>{{Column}}</th><th>{{Column}}</th><th>{{Column}}</th></tr></thead>
+    <tbody>
+      <tr><td>{{Row label}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+      <tr class="is-key"><td>{{The key row}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ===== R3 SWITCHER — related views of one thing (two tables, five interfaces, before/after) ===== -->
+<div data-switch>
+  <div class="seg" role="group" aria-label="{{What is being switched}}">
+    <button type="button" data-key="a" aria-pressed="true">{{View A}}</button>
+    <button type="button" data-key="b">{{View B}}</button>
+  </div>
+  <div data-panel="a"><!-- R2 table, R12 code, or any block --></div>
+  <div data-panel="b" hidden><!-- … --></div>
+</div>
+
+
+<!-- ===== R4 FILTERED CLASSIFIED TABLE — a list where each item has a class (deterministic / AI / human…) =====
+     "{n}" in the All button is replaced with the row count. A row may carry several tags. -->
+<div data-filter>
+  <div class="seg" role="group" aria-label="Filter">
+    <button type="button" data-f="all">All {n}</button>
+    <button type="button" data-f="ok">{{Class one}}</button>
+    <button type="button" data-f="ai">{{Class two}}</button>
+    <button type="button" data-f="human">{{Class three}}</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>{{Item}}</th><th>{{Class}}</th><th>{{Guardrails / notes}}</th></tr></thead>
+      <tbody>
+        <tr data-tags="ok"><td>{{Item}}</td><td><span class="chips"><span class="chip chip--ok">{{Class one}}</span></span></td><td>{{…}}</td></tr>
+        <tr data-tags="ai human"><td>{{Item}}</td><td><span class="chips"><span class="chip chip--ai">{{Class two}}</span><span class="chip chip--human">{{Class three}}</span></span></td><td>{{…}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ===== R5 EXPLORER — an architecture or system map; click a part to see its definition =====
+     Lanes: inbound / core (.lane--core, add .lane--flow when the core is a sequence) / outbound.
+     Each .item has data-key; each detail has data-panel with the same key. Mark one item aria-pressed="true" as the default. -->
+<div data-explorer>
+  <div class="lanes">
+    <div class="lane">
+      <p class="lane__title">{{Inbound}}</p>
+      <button class="item" type="button" data-key="in1">{{Part}} <small>{{hint}}</small></button>
+    </div>
+    <div class="lane lane--core lane--flow">
+      <p class="lane__title">{{Core}}</p>
+      <button class="item" type="button" data-key="c1">{{Step}}</button>
+      <button class="item" type="button" data-key="c2" aria-pressed="true">{{Step}}</button>
+    </div>
+    <div class="lane">
+      <p class="lane__title">{{Outbound}}</p>
+      <button class="item" type="button" data-key="out1">{{Part}}</button>
+    </div>
+  </div>
+  <div class="strip"><div>{{Shared backbone element}}</div><div>{{…}}</div></div>
+  <div class="detail" data-panel="in1"><h3>{{Part}}</h3><dl class="full"><dt>Responsibility</dt><dd>{{…}}</dd></dl><dl><dt>Inputs</dt><dd>{{…}}</dd></dl><dl><dt>Outputs</dt><dd>{{…}}</dd></dl></div>
+  <div class="detail" data-panel="c1" hidden><h3>{{Step}}</h3><dl class="full"><dt>Responsibility</dt><dd>{{…}}</dd></dl><dl><dt>Inputs</dt><dd>{{…}}</dd></dl><dl><dt>Outputs</dt><dd>{{…}}</dd></dl></div>
+  <div class="detail" data-panel="c2" hidden>…</div>
+  <div class="detail" data-panel="out1" hidden>…</div>
+</div>
+
+
+<!-- ===== R6 STEPS — a named pipeline (3–7 steps), auto-numbered ===== -->
+<div class="steps">
+  <div><b>{{Step}}</b><small>{{What happens}}</small></div>
+  <div><b>{{Step}}</b><small>{{…}}</small></div>
+  <div><b>{{Step}}</b><small>{{…}}</small></div>
+</div>
+
+
+<!-- ===== R7 LADDER / TAXONOMY — ordered categories with definition + evidence; traps marked ===== -->
+<div class="ladder">
+  <div class="rung"><b>{{Category}}</b><span>{{Definition}}</span><span>{{Evidence / what proves it}}</span></div>
+  <div class="rung rung--trap"><b>{{Trap category}}</b><span>{{Definition}}</span><span>{{Why it misleads, and the check that prevents it}}</span></div>
+</div>
+
+
+<!-- ===== R8 ROUTES — mapping from a type to an owner/destination ===== -->
+<div class="panel routes">
+  <span class="from">{{Type}}</span><span class="arrow">→</span><span class="to">{{Destination}}</span>
+  <span class="from">{{Type}}</span><span class="arrow">→</span><span class="to">{{Destination}}</span>
+</div>
+
+
+<!-- ===== R9 SCENARIO SELECTOR — "what happens if…" cases with steps and blast radius ===== -->
+<div data-switch>
+  <div class="seg" role="group" aria-label="Scenario">
+    <button type="button" data-key="s1" aria-pressed="true">{{Scenario}}</button>
+    <button type="button" data-key="s2">{{Scenario}}</button>
+  </div>
+  <div class="scenario" data-panel="s1">
+    <div class="panel"><h3>{{Scenario}}</h3><ol><li>{{Step}}</li><li>{{Step}}</li></ol></div>
+    <div class="panel"><p class="eyebrow">{{Touched / impact}}</p><p><strong>{{…}}</strong></p></div>
+  </div>
+  <div class="scenario" data-panel="s2" hidden>…</div>
+</div>
+
+
+<!-- ===== R10 TIMELINE — phases or history; .phase--key marks the one to start with ===== -->
+<div class="timeline">
+  <div class="phase"><b>{{Phase 0 · Name}}</b><span class="meta">{{Dependency}}</span><p>{{Scope}}</p><p class="exit">{{Exit criterion}}</p></div>
+  <div class="phase phase--key"><b>{{Phase 1 · Name}}</b><span class="meta">{{…}}</span><p>{{…}}</p></div>
+</div>
+
+
+<!-- ===== R11 CALLOUTS — rules (ok), warnings/caveats (default = gap), decisions for humans (human) ===== -->
+<div class="callout"><strong>{{Warning}}</strong>{{One or two sentences.}}</div>
+<div class="callout callout--ok"><strong>{{Rule}}</strong>{{…}}</div>
+<div class="callout callout--human"><strong>{{Decision needed}}</strong>{{…}}</div>
+
+
+<!-- ===== R12 CODE / INTERFACE — contracts, schemas, commands, exactly as the source gives them ===== -->
+<pre class="code">{{interface Name v1
+  method(arg) -> Result}}</pre>
+
+
+<!-- ===== R13 TUPLE + VARIANTS — a composite definition and worked examples ===== -->
+<div class="tuple"><em>{{Thing}} =</em><span>{{part}}</span><span>{{part}}</span><span>{{part}}</span></div>
+<div class="panel" style="display:grid;gap:8px">
+  <h3>{{Worked example}}</h3>
+  <div class="variant"><b>{{Variant}}</b><small>{{what distinguishes it}}</small></div>
+  <div class="variant"><b>{{Variant}}</b><small>{{…}}</small></div>
+</div>
+
+
+<!-- ===== R14 OPEN QUESTIONS — auto-numbered Q1, Q2… ===== -->
+<ol class="questions">
+  <li>{{Question the source leaves open, and what depends on it.}}</li>
+  <li>{{…}}</li>
+</ol>
+
+
+<!-- ===== R15 STATUS TABLE — e.g. risks eliminated vs residual ===== -->
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>{{Item}}</th><th>Status</th><th>{{How}}</th></tr></thead>
+    <tbody>
+      <tr><td>{{…}}</td><td><span class="chip chip--ok">{{Eliminated}}</span></td><td>{{…}}</td></tr>
+      <tr><td>{{…}}</td><td><span class="chip chip--gap">{{Residual}}</span></td><td>{{…}}</td></tr>
+    </tbody>
+  </table>
+</div>

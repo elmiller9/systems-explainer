@@ -1,0 +1,15 @@
+{
+  "name": "elmiller9",
+  "description": "Claude Code plugins by elmiller9: blueprint-style educational explainers and detailed reference guides for any system.",
+  "owner": {
+    "name": "elmiller9",
+    "url": "https://github.com/elmiller9"
+  },
+  "plugins": [
+    {
+      "name": "systems-explainer",
+      "source": "./plugins/systems-explainer",
+      "description": "Educational explainers and detailed reference guides for any system, sharing one palette."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# Pages generated while using the skills in this repo (copy keepers into examples/)
+explainers/
+
+# Raw source analyses: third-party transcripts and private research, local only.
+# The playbook keeps the patterns in original wording; the sources themselves stay out of git.
+sources/*
+!sources/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local Claude Code settings and scratch output
+.claude/settings.local.json
+*.png
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

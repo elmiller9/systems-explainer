@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Systems Explainer Tour</title>
+<meta name="description" content="How the systems-explainer plugin turns one request into a blueprint-style teaching page, in four pieces.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* ============================================================
+   BLUEPRINT EXPLAINER TEMPLATE — systems-explainer plugin
+   Desktop-first (1280–1920px). Tokens → layout → zones → diagrams → motion.
+   Do not hard-code colors below the token blocks; use var(--token).
+   ============================================================ */
+
+/* ---------- 1. TOKENS ---------- */
+/* TOKENS:BEGIN — generated from shared/tokens.css by scripts/sync_tokens.py; do not edit here */
+/* ============================================================
+   SHARED DESIGN TOKENS — systems-explainer plugin
+   Single source of truth for color and type in BOTH page types
+   (blueprint explainer + reference guide). Edit here, then run:
+       python scripts/sync_tokens.py
+   which copies this block between the TOKENS:BEGIN / TOKENS:END
+   markers in every template. Never edit those blocks in place.
+   ============================================================ */
+:root {
+  /* Surfaces + ink */
+  --paper: #F3EBE0;        /* page background, warm cream */
+  --card: #FFFDF8;         /* boxes, nodes, table bodies */
+  --ink: #222222;          /* text, lines, borders (never pure black) */
+  --ink-soft: #5B5550;     /* secondary text */
+  --rule: #CFC4B4;         /* hairlines, guides */
+  --grid-dot: #E2D7C6;     /* blueprint dot grid */
+  --muted-fill: #E8DFD2;   /* grayed-out / wrong-path fill, table header fill */
+
+  /* Accent family */
+  --accent: #C55A44;       /* terracotta: the one thing to notice */
+  --accent-2: #D97746;     /* burnt orange: 2nd series */
+  --accent-3: #8C3B2D;     /* deep brick: 3rd series */
+  --olive: #6F7F4E;        /* good / allowed / works */
+  --slate: #4E6A80;        /* neutral system element, 4th series */
+  --ochre: #9A6A12;        /* human decision / judgment */
+  --on-accent: #FFFDF8;    /* text on accent fills */
+
+  /* Semantic roles (reference guide chips, callouts, explainer status) */
+  --ok: var(--olive);      /* verified, eliminated, allowed */
+  --gap: var(--accent);    /* gap, risk, trap, forbidden */
+  --ai: var(--slate);      /* AI-assisted */
+  --human: var(--ochre);   /* human decision */
+  --tint-ok: color-mix(in srgb, var(--olive) 16%, var(--card));
+  --tint-gap: color-mix(in srgb, var(--accent) 14%, var(--card));
+  --tint-ai: color-mix(in srgb, var(--slate) 15%, var(--card));
+  --tint-human: color-mix(in srgb, var(--ochre) 15%, var(--card));
+
+  /* Type families (load via the Google Fonts link in each template) */
+  --f-display: "Bebas Neue", Anton, "Arial Narrow", sans-serif;
+  --f-mono: "Space Mono", "Courier Prime", ui-monospace, monospace;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+    --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+    --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+    --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1D1A17; --card: #272320; --ink: #EDE4D6; --ink-soft: #B3A898;
+  --rule: #4A433C; --grid-dot: #2B2723; --muted-fill: #332E29;
+  --accent: #E07A62; --accent-2: #EB9563; --accent-3: #C9705E;
+  --olive: #9DB07A; --slate: #8FB0C8; --ochre: #E0B04A; --on-accent: #1D1A17;
+  color-scheme: dark;
+}
+/* TOKENS:END */
+:root { --rail-w: 232px; --stroke: 3px; --radius: 8px; --shadow: 5px 5px 0 var(--ink); }
+
+/* ---------- 2. BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-snap-type: y proximity; scroll-behavior: auto; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--grid-dot) 1.2px, transparent 1.4px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+code, kbd { font-family: var(--f-mono); font-size: .9em; }
+.label {
+  font-family: var(--f-mono); font-size: 12.5px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+
+/* ---------- 3. RAIL (minimap) + PROGRESS ---------- */
+.rail {
+  position: fixed; inset: 0 auto 0 0; width: var(--rail-w);
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 28px 18px 20px;
+  background: var(--paper);
+  border-right: var(--stroke) solid var(--ink);
+  z-index: 10;
+}
+.rail__title {
+  font-family: var(--f-display); font-size: 28px; line-height: .95; letter-spacing: .01em;
+  margin: 0; padding-bottom: 14px; border-bottom: var(--stroke) solid var(--ink);
+}
+.rail__list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.rail__list a {
+  display: grid; grid-template-columns: 30px 1fr; align-items: baseline; gap: 6px;
+  padding: 6px 8px; margin: 0 -8px; border-radius: 6px;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+  text-decoration: none; color: var(--ink-soft);
+}
+.rail__list a .n { font-weight: 700; }
+.rail__list a:hover { color: var(--ink); background: var(--muted-fill); }
+.rail__list a[aria-current="true"] { color: var(--ink); background: var(--card); box-shadow: inset 4px 0 0 var(--accent); }
+.rail__list a[aria-current="true"] .n { color: var(--accent); }
+.rail__foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rail__foot .label { font-size: 11px; }
+.theme-btn {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px;
+  padding: 4px 10px; cursor: pointer;
+}
+.progress {
+  position: fixed; top: 0; left: var(--rail-w); right: 0; height: 4px;
+  background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); z-index: 11;
+}
+
+/* ---------- 4. ZONES ---------- */
+main { margin-left: var(--rail-w); }
+.zone {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+  gap: clamp(28px, 3.2vw, 64px);
+  align-items: center;
+  padding: clamp(36px, 6vh, 72px) clamp(32px, 4vw, 80px);
+  scroll-snap-align: start;
+  border-bottom: 2px dashed var(--rule);
+  position: relative;
+}
+.zone--flip { grid-template-columns: minmax(0, 62fr) minmax(0, 38fr); }
+.zone--flip .zone__text { order: 2; }
+.zone__head { margin-bottom: 18px; padding-bottom: 14px; border-bottom: var(--stroke) solid var(--ink); }
+.zone__num {
+  display: block; font-family: var(--f-display); color: var(--accent);
+  font-size: clamp(72px, 8vw, 124px); line-height: .82;
+}
+.zone__title {
+  font-family: var(--f-display); font-weight: 400; margin: 6px 0 0;
+  font-size: clamp(40px, 4.4vw, 72px); line-height: .95; letter-spacing: .005em;
+}
+.zone__lede { font-size: clamp(18px, 1.35vw, 21px); margin: 0 0 14px; max-width: 46ch; }
+.zone__points { list-style: none; margin: 0 0 20px; padding: 0; max-width: 48ch; }
+.zone__points li { position: relative; padding-left: 26px; margin: 8px 0; font-size: 17px; }
+.zone__points li::before {
+  content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 10px;
+  background: var(--accent); border: 2px solid var(--ink);
+}
+.aphorism {
+  margin: 8px 0 0; padding: 14px 18px; max-width: 46ch;
+  background: var(--card); border: var(--stroke) solid var(--ink); border-radius: 4px;
+  box-shadow: var(--shadow);
+  font-family: var(--f-display); font-size: clamp(24px, 2vw, 32px); line-height: 1.05; letter-spacing: .01em;
+}
+.aphorism::before { content: "RULE"; display: block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); margin-bottom: 4px; }
+
+.zone__figure { margin: 0; min-width: 0; }
+.zone__figure > svg { display: block; width: 100%; height: auto; max-height: 80vh; }
+.zone__figure figcaption { margin-top: 10px; }
+
+/* Wide zone: header row on top, full-width diagram below */
+.zone--wide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: center; }
+.zone--wide .zone__text { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 40px; align-items: end; }
+.zone--wide .zone__head { margin: 0; }
+.zone--wide .zone__lede { margin: 0; max-width: 64ch; }
+.zone--wide .zone__figure > svg { max-height: 62vh; }
+
+/* Statement zone: one big line */
+.zone--statement { grid-template-columns: minmax(0, 1fr); text-align: center; justify-items: center; }
+.statement {
+  font-family: var(--f-display); font-size: clamp(72px, 11vw, 180px); line-height: .88; margin: 0;
+}
+.statement em { font-style: normal; color: var(--accent); }
+
+/* Short laptop viewports (a 1366×768 screen leaves ~650–670px after browser chrome):
+   number sits beside the title, type and padding tighten so each zone fits one screen. */
+@media (min-width: 900px) and (max-height: 820px) {
+  .zone { padding-top: 26px; padding-bottom: 26px; column-gap: 48px; }
+  .zone__head { display: flex; align-items: flex-end; gap: 18px; margin-bottom: 14px; padding-bottom: 10px; }
+  .zone__num { font-size: 68px; }
+  .zone__title { font-size: clamp(34px, 3.3vw, 48px); margin: 0; }
+  .zone__lede { font-size: 17px; margin-bottom: 10px; }
+  .zone__points { margin-bottom: 14px; }
+  .zone__points li { font-size: 15.5px; margin: 5px 0; }
+  .aphorism { font-size: 22px; padding: 10px 14px; }
+  .zone__figure > svg { max-height: 74vh; }
+  .zone--wide { row-gap: 18px; }
+  .zone--wide .zone__figure > svg { max-height: 58vh; }
+  .card { padding: 14px 16px; }
+  .card__title { font-size: 26px; }
+  .card__body { font-size: 15px; }
+}
+
+/* ---------- 5. DIAGRAM PRIMITIVES (SVG) ---------- */
+.d-node { fill: var(--card); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-node--accent { fill: var(--accent); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-node--muted { fill: var(--muted-fill); stroke: var(--ink-soft); stroke-width: 2; }
+.d-node--ink { fill: var(--ink); stroke: var(--ink); stroke-width: var(--stroke); }
+.d-shadow { fill: var(--ink); stroke: none; }
+.d-line { fill: none; stroke: var(--ink); stroke-width: var(--stroke); stroke-linecap: round; stroke-linejoin: round; }
+.d-line--accent { stroke: var(--accent); }
+.d-line--a2 { stroke: var(--accent-2); }
+.d-line--a3 { stroke: var(--accent-3); }
+.d-line--slate { stroke: var(--slate); }
+.d-line--soft { stroke: var(--ink-soft); stroke-width: 2; }
+.d-line--dashed { stroke-dasharray: 8 7; }
+.d-label { font-family: var(--f-mono); font-size: 15px; letter-spacing: .06em; fill: var(--ink); }
+.d-label--sm { font-size: 13px; }
+.d-label--soft { fill: var(--ink-soft); }
+.d-label--accent { fill: var(--accent); font-weight: 700; }
+.d-label--on-accent { fill: var(--on-accent); font-weight: 700; }
+.d-label--on-ink { fill: var(--paper); font-weight: 700; }
+.d-title { font-family: var(--f-display); font-size: 34px; fill: var(--ink); }
+.d-title--accent { fill: var(--accent); }
+.d-arrowhead { fill: var(--ink); }
+.d-arrowhead--accent { fill: var(--accent); }
+.arrow { marker-end: url(#ah); }
+.arrow-accent { marker-end: url(#ah-accent); }
+
+/* ---------- 5b. HTML COMPONENTS (cards, mocks, file tree, recipe, queue) ---------- */
+.card {
+  background: var(--card); border: var(--stroke) solid var(--ink); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px 20px; min-width: 0;
+}
+.card--muted { background: var(--muted-fill); border-color: var(--ink-soft); box-shadow: none; color: var(--ink-soft); }
+.card--accent { border-color: var(--accent); box-shadow: 5px 5px 0 var(--accent); }
+.card--paper { border-radius: 0; }
+.card__label { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+.card__title { font-family: var(--f-display); font-size: 32px; line-height: 1; margin: 0 0 8px; font-weight: 400; }
+.card__body { margin: 0; font-size: 16px; }
+.card__foot {
+  margin-top: 12px; padding-top: 8px; border-top: 2px dashed var(--rule);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.card__icon { font-size: 22px; line-height: 1; margin-bottom: 8px; display: block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px; align-items: stretch; }
+.cards--baseline { padding-bottom: 22px; border-bottom: 2px dotted var(--ink-soft); }
+.strike { text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+.hl { color: var(--accent); font-weight: 600; }
+
+.mock { background: var(--card); border: var(--stroke) solid var(--ink); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.mock__bar {
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: var(--stroke) solid var(--ink);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+}
+.mock__bar i { width: 11px; height: 11px; border: 2px solid var(--ink); border-radius: 50%; display: inline-block; }
+.mock__bar span { margin-left: 8px; }
+.mock__body { padding: 16px 18px; }
+.msg { max-width: 82%; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 10px; margin: 10px 0; font-size: 16px; }
+.msg--ai { background: var(--muted-fill); }
+.msg--me { margin-left: auto; background: var(--card); border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+.hand-note { font-family: var(--f-mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); text-align: right; margin: 4px 0 0; }
+.mock--terminal .mock__body { background: var(--ink); color: var(--paper); font-family: var(--f-mono); font-size: 15px; line-height: 1.6; }
+.mock--terminal .prompt::before { content: "> "; color: var(--accent); font-weight: 700; }
+.mock--terminal .out { color: var(--rule); }
+
+.filetree { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+.filetree__head {
+  display: inline-block; font-family: var(--f-mono); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 4px 14px; margin-bottom: 6px; background: var(--card);
+}
+.tag--red { background: color-mix(in srgb, var(--accent) 24%, var(--card)); }
+.tag--green { background: color-mix(in srgb, var(--olive) 24%, var(--card)); }
+.tag--blue { background: color-mix(in srgb, var(--slate) 24%, var(--card)); }
+.file {
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+  border: 2px solid var(--ink); border-radius: 6px; background: var(--card); padding: 7px 10px; margin: 8px 0;
+  font-family: var(--f-mono); font-size: 13px;
+}
+.file::before { content: "▤"; color: var(--ink-soft); }
+.file .name { flex: 1; }
+.file .size { color: var(--ink-soft); font-size: 11px; }
+
+.recipe { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
+.recipe > div { padding: 16px 18px; }
+.recipe > div + div { border-left: var(--stroke) solid var(--ink); }
+.recipe .stack > * + * { border-top: 2px dashed var(--rule); margin-top: 12px; padding-top: 12px; }
+.recipe h4 { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.recipe ul, .recipe ol { margin: 0; padding-left: 20px; font-size: 15px; }
+.checks { list-style: none; padding-left: 0 !important; }
+.checks li { position: relative; padding-left: 26px; margin: 6px 0; }
+.checks li::before { content: ""; position: absolute; left: 0; top: .25em; width: 14px; height: 14px; border: 2px solid var(--ink); background: var(--card); }
+
+.checklist { list-style: none; margin: 0; padding: 0; font-family: var(--f-mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; }
+.checklist li { padding: 4px 0 4px 26px; position: relative; }
+.checklist li::before { position: absolute; left: 0; font-weight: 700; }
+.checklist .ok::before { content: "✓"; color: var(--olive); }
+.checklist .no { color: var(--accent); }
+.checklist .no::before { content: "✗"; }
+
+.queue__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 10px 0; border-bottom: 2px dashed var(--rule); font-size: 15px;
+}
+.queue__row:last-child { border-bottom: 0; }
+.pills { display: flex; gap: 6px; }
+.pill {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 3px 10px; background: var(--card); color: var(--ink);
+}
+.pill--accent { background: var(--accent); color: var(--on-accent); }
+
+/* ---------- 6. MOTION ---------- */
+/* Hidden states only apply when JS runs (html.js), so no-JS readers see everything. */
+.js .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.js .in-view .draw {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--i, 0) * 150ms + 150ms);
+}
+.js .zone:not(.settled) .draw.arrow,
+.js .zone:not(.settled) .draw.arrow-accent { marker-end: none; }
+
+.js .pop { opacity: 0; transform: scale(.86); transform-box: fill-box; transform-origin: center; }
+.js .in-view .pop {
+  opacity: 1; transform: none;
+  transition: opacity .35s ease-out, transform .35s cubic-bezier(.3,1.4,.5,1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+.js .stamp { opacity: 0; transform: translateY(-30px) rotate(-14deg) scale(1.3); transform-box: fill-box; transform-origin: center; }
+.js .in-view .stamp {
+  opacity: 1; transform: rotate(-6deg);
+  transition: opacity .2s ease-in, transform .28s cubic-bezier(.5,0,.75,0);
+  transition-delay: calc(var(--i, 0) * 110ms + 400ms);
+}
+.measuring .pop, .measuring .stamp { transform: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .js .draw { stroke-dasharray: none; stroke-dashoffset: 0; }
+  .js .pop, .js .stamp { opacity: 1; transform: none; }
+  .js .in-view .draw, .js .in-view .pop, .js .in-view .stamp { transition: none; }
+}
+
+/* ---------- 7. NARROW FALLBACK (< 900px) ---------- */
+@media (max-width: 899px) {
+  html { scroll-snap-type: none; }
+  .rail {
+    position: sticky; top: 0; inset: auto; width: auto; flex-direction: row; align-items: center;
+    padding: 10px 16px; gap: 12px; border-right: 0; border-bottom: var(--stroke) solid var(--ink);
+  }
+  .rail__title { font-size: 20px; border: 0; padding: 0; white-space: nowrap; }
+  .rail__list { display: flex; overflow-x: auto; gap: 4px; min-width: 0; }
+  .rail__list a { margin: 0; grid-template-columns: auto; white-space: nowrap; }
+  .rail__list a .t { display: none; }
+  .rail__foot .label { display: none; }
+  .progress { left: 0; }
+  main { margin-left: 0; }
+  .zone, .zone--wide { grid-template-columns: minmax(0, 1fr); min-height: auto; padding: 48px 16px; }
+  .zone--flip .zone__text { order: 0; }
+  .zone--wide .zone__text { display: block; }
+  .zone--wide .zone__lede { margin-top: 12px; }
+}
+
+/* ---------- 8. PAGE-SPECIFIC STYLES (add below; tokens only) ---------- */
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs: arrowheads used by every diagram (url(#ah), url(#ah-accent)). Keep this block. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path class="d-arrowhead" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+    <marker id="ah-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path class="d-arrowhead--accent" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+</svg>
+
+<nav class="rail" aria-label="Zones">
+  <p class="rail__title">Systems<br>Explainer</p>
+  <ol class="rail__list" id="railList"><!-- filled from zones by script --></ol>
+  <div class="rail__foot">
+    <span class="label">↑ ↓ to step</span>
+    <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+  </div>
+</nav>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<main>
+
+  <!-- 01 HOOK — Arc A (N-pieces stack), count = four pieces -->
+  <section class="zone zone--wide" id="z01" data-title="One request">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">01</span>
+        <h1 class="zone__title">One request,<br>one finished page</h1>
+      </header>
+      <p class="zone__lede">You name a topic, and a teaching page comes back that explains it as a system. It runs on four pieces.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 400" role="img" aria-labelledby="z01d">
+        <title id="z01d">The systems explainer feeds four pieces that combine into your page</title>
+        <g class="pop" style="--i:0">
+          <rect class="d-shadow" x="46" y="168" width="220" height="76" rx="8"/>
+          <rect class="d-node--accent" x="40" y="162" width="220" height="76" rx="8"/>
+          <text class="d-label d-label--on-accent" x="150" y="206" text-anchor="middle">YOUR TOPIC</text>
+        </g>
+        <path class="d-line d-line--accent draw" pathLength="1" style="--i:1"
+              d="M260,200 H320 M320,92 V308 M320,92 H372 M320,164 H372 M320,236 H372 M320,308 H372"/>
+        <g class="pop" style="--i:3"><rect class="d-node" x="380" y="68" width="230" height="48" rx="8"/><text class="d-label" x="398" y="98">1 THE RECIPE</text></g>
+        <g class="pop" style="--i:4"><rect class="d-node" x="380" y="140" width="230" height="48" rx="8"/><text class="d-label" x="398" y="170">2 THE LIBRARY</text></g>
+        <g class="pop" style="--i:5"><rect class="d-node" x="380" y="212" width="230" height="48" rx="8"/><text class="d-label" x="398" y="242">3 THE PARTS BIN</text></g>
+        <g class="pop" style="--i:6"><rect class="d-node" x="380" y="284" width="230" height="48" rx="8"/><text class="d-label" x="398" y="314">4 THE LOOP</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:7"
+              d="M610,92 H680 M610,164 H680 M610,236 H680 M610,308 H680 M680,92 V308 M680,200 H752"/>
+        <g class="pop" style="--i:9">
+          <rect class="d-shadow" x="766" y="166" width="170" height="80" rx="8"/>
+          <rect class="d-node" x="760" y="160" width="170" height="80" rx="8"/>
+          <text class="d-label d-label--accent" x="845" y="206" text-anchor="middle">YOUR PAGE</text>
+        </g>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 02 PIECE ONE -->
+  <section class="zone" id="z02" data-title="The recipe">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">02</span>
+        <h2 class="zone__title">Piece one:<br>the recipe</h2>
+      </header>
+      <p class="zone__lede">A skill file that holds the procedure: what it needs, the steps in order, and the checks it runs before handing anything back.</p>
+      <ul class="zone__points">
+        <li>It reads the library before it writes a word.</li>
+        <li>It scripts every zone as text before any HTML.</li>
+        <li>It won't hand over a page that fails a check.</li>
+      </ul>
+      <p class="aphorism">Write the steps once. Follow them every time.</p>
+    </div>
+    <figure class="zone__figure">
+      <div class="card recipe pop" style="--i:0">
+        <div class="stack">
+          <div><h4>What it needs</h4><ul><li>A topic</li><li>Who it's for</li><li>Any source material</li></ul></div>
+          <div><h4>The steps</h4><ol><li>Pick the arc and the count</li><li>Script every zone</li><li>Build from the template</li><li>Check, then hand over</li></ol></div>
+        </div>
+        <div><h4>The checks</h4><ul class="checks"><li>Count stated, and kept</li><li>Every zone fits one laptop screen</li><li>Every abstract idea has an object</li><li>No placeholders left</li><li>Last zone repeats the first diagram</li></ul></div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 03 PIECE TWO -->
+  <section class="zone zone--flip" id="z03" data-title="The library">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">03</span>
+        <h2 class="zone__title">Piece two:<br>the library</h2>
+      </header>
+      <p class="zone__lede">Four reference files hold everything the recipe knows about teaching. The recipe points at them and never keeps its own copy.</p>
+      <ul class="zone__points">
+        <li>Change a color token once and every future page changes with it.</li>
+        <li>The metaphor dictionary maps each abstract idea to an object you can draw.</li>
+      </ul>
+      <p class="aphorism">Point at the shelf. Never copy the book.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 540" role="img" aria-label="An index card above a shelf of four binders: method, visuals, brief, checks">
+        <g class="pop" style="--i:0">
+          <rect class="d-shadow" x="306" y="36" width="360" height="72" rx="0"/>
+          <rect class="d-node" x="300" y="30" width="360" height="72" rx="0"/>
+          <text class="d-label d-label--sm d-label--accent" x="480" y="60" text-anchor="middle">SKILL.MD SAYS:</text>
+          <text class="d-label" x="480" y="86" text-anchor="middle">READ THESE FIRST</text>
+        </g>
+        <path class="d-line d-line--accent draw" pathLength="1" style="--i:1"
+              d="M480,102 V136 M215,136 H755 M215,136 V166 M395,136 V166 M575,136 V166 M755,136 V166"/>
+        <g class="pop" style="--i:2"><rect class="d-node" x="140" y="170" width="150" height="230" rx="4"/><rect class="d-node--accent" x="160" y="196" width="110" height="46" rx="2"/><text class="d-label d-label--on-accent" x="215" y="225" text-anchor="middle">METHOD</text><circle class="d-node" cx="215" cy="356" r="12"/></g>
+        <g class="pop" style="--i:3"><rect class="d-node" x="320" y="170" width="150" height="230" rx="4"/><rect class="d-node--muted" x="340" y="196" width="110" height="46" rx="2"/><text class="d-label" x="395" y="225" text-anchor="middle">VISUALS</text><circle class="d-node" cx="395" cy="356" r="12"/></g>
+        <g class="pop" style="--i:4"><rect class="d-node" x="500" y="170" width="150" height="230" rx="4"/><rect class="d-node--muted" x="520" y="196" width="110" height="46" rx="2"/><text class="d-label" x="575" y="225" text-anchor="middle">BRIEF</text><circle class="d-node" cx="575" cy="356" r="12"/></g>
+        <g class="pop" style="--i:5"><rect class="d-node" x="680" y="170" width="150" height="230" rx="4"/><rect class="d-node--muted" x="700" y="196" width="110" height="46" rx="2"/><text class="d-label" x="755" y="225" text-anchor="middle">CHECKS</text><circle class="d-node" cx="755" cy="356" r="12"/></g>
+        <path class="d-line draw" pathLength="1" style="--i:6; stroke-width:6" d="M100,404 H870 M140,404 V430 M830,404 V430"/>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="215" y="470" text-anchor="middle">HOW TO TEACH</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="395" y="470" text-anchor="middle">HOW IT LOOKS</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="575" y="470" text-anchor="middle">WHAT TO DECIDE</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="755" y="470" text-anchor="middle">WHAT TO VERIFY</text>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 04 PIECE THREE -->
+  <section class="zone" id="z04" data-title="The parts bin">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">04</span>
+        <h2 class="zone__title">Piece three:<br>the parts bin</h2>
+      </header>
+      <p class="zone__lede">The page is assembled from a ready-made template and a library of diagrams, not drawn from scratch.</p>
+      <ul class="zone__points">
+        <li>The template brings the tokens, the minimap rail, keyboard stepping and draw-in motion.</li>
+        <li>The components bring 13 diagrams and 8 interface mock-ups, all token-styled.</li>
+      </ul>
+      <p class="aphorism">Nobody should draw the same door twice.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 260" role="img" aria-label="Pipeline: template, components, your zones, the page">
+        <g class="pop" style="--i:0"><rect class="d-node" x="30" y="90" width="180" height="80" rx="8"/><text class="d-label" x="120" y="136" text-anchor="middle">TEMPLATE</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:1" d="M210,130 H262"/>
+        <g class="pop" style="--i:2"><rect class="d-node" x="270" y="90" width="180" height="80" rx="8"/><text class="d-label" x="360" y="136" text-anchor="middle">COMPONENTS</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:3" d="M450,130 H502"/>
+        <g class="pop" style="--i:4"><rect class="d-node" x="510" y="90" width="180" height="80" rx="8"/><text class="d-label" x="600" y="136" text-anchor="middle">YOUR ZONES</text></g>
+        <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:5" d="M690,130 H742"/>
+        <g class="pop" style="--i:6"><rect class="d-shadow" x="756" y="96" width="180" height="80" rx="8"/><rect class="d-node--accent" x="750" y="90" width="180" height="80" rx="8"/><text class="d-label d-label--on-accent" x="840" y="136" text-anchor="middle">THE PAGE</text></g>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="120" y="204" text-anchor="middle">TOKENS + RAIL</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="360" y="204" text-anchor="middle">S1–S13 · H1–H8</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="600" y="204" text-anchor="middle">SCRIPTED FIRST</text>
+        <text class="d-label d-label--sm d-label--soft pop" style="--i:7" x="840" y="204" text-anchor="middle">ONE HTML FILE</text>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 05 THE PART PEOPLE GET WRONG -->
+  <section class="zone zone--wide" id="z05" data-title="Script first">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">05</span>
+        <h2 class="zone__title">The part people<br>get wrong</h2>
+      </header>
+      <p class="zone__lede">The temptation is to open the template and start drawing. Write every zone as plain text first: title, lede, the object it shows, and its one rule.</p>
+    </div>
+    <figure class="zone__figure">
+      <div class="cards">
+        <div class="card card--muted pop" style="--i:0">
+          <p class="card__label">Build first</p>
+          <p class="card__title">Pretty diagrams, no argument</p>
+          <p class="card__body">Each zone looks fine on its own, but nothing connects. The count drifts, and the ending doesn't land.</p>
+        </div>
+        <div class="card card--accent pop" style="--i:1">
+          <p class="card__label">Script first</p>
+          <p class="card__title">The argument draws itself</p>
+          <p class="card__body">Every zone already knows its object and its rule. The HTML just carries them.</p>
+        </div>
+      </div>
+      <p class="aphorism pop" style="--i:2; margin-top:28px">If you can't script the zone, you can't draw it.</p>
+    </figure>
+  </section>
+
+  <!-- 06 COPYABLE ASSET -->
+  <section class="zone" id="z06" data-title="Try it">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">06</span>
+        <h2 class="zone__title">The one line<br>to type</h2>
+      </header>
+      <p class="zone__lede">Call the skill by name and give it a topic. Say who the page is for if it isn't obvious.</p>
+      <ul class="zone__points">
+        <li>It works for any system: kitchens, invoicing, networks, agents.</li>
+        <li>The page lands in <code>explainers/</code> unless you name a path.</li>
+      </ul>
+    </div>
+    <figure class="zone__figure">
+      <div class="mock mock--terminal pop" style="--i:0">
+        <div class="mock__bar"><i></i><i></i><i></i><span>Claude Code</span></div>
+        <div class="mock__body">
+          <div class="prompt">/systems-explainer:blueprint-explainer how a restaurant kitchen ticket system works, for new front-of-house staff</div>
+          <div class="out">→ explainers/kitchen-ticket-system.html · arc A · four pieces</div>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 07 PIECE FOUR -->
+  <section class="zone zone--flip" id="z07" data-title="The loop">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">07</span>
+        <h2 class="zone__title">Piece four:<br>the loop</h2>
+      </header>
+      <p class="zone__lede">Every correction you make gets one question: does this belong in the playbook? If it does, it goes into the library, and the next page starts from there.</p>
+      <ul class="zone__points">
+        <li>The scoreboard: did you have to make the same correction twice?</li>
+      </ul>
+      <p class="aphorism">Fix it once in the page. Fix it for good in the playbook.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 540" role="img" aria-label="Loop: build, review, correct, fold in">
+        <text class="d-title d-title--accent pop" style="--i:0" x="480" y="282" text-anchor="middle">THE LOOP</text>
+        <g class="pop" style="--i:1"><rect class="d-node--accent" x="390" y="44" width="180" height="52" rx="8"/><text class="d-label d-label--on-accent" x="480" y="76" text-anchor="middle">1 BUILD</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:2" d="M586,100 A200,200 0 0 1 661,185"/>
+        <g class="pop" style="--i:3"><rect class="d-node" x="590" y="244" width="180" height="52" rx="8"/><text class="d-label" x="680" y="276" text-anchor="middle">2 REVIEW</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:4" d="M661,355 A200,200 0 0 1 586,440"/>
+        <g class="pop" style="--i:5"><rect class="d-node" x="390" y="444" width="180" height="52" rx="8"/><text class="d-label" x="480" y="476" text-anchor="middle">3 CORRECT</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:6" d="M374,440 A200,200 0 0 1 299,355"/>
+        <g class="pop" style="--i:7"><rect class="d-node" x="190" y="244" width="180" height="52" rx="8"/><text class="d-label" x="280" y="276" text-anchor="middle">4 FOLD IN</text></g>
+        <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:8" d="M299,185 A200,200 0 0 1 374,100"/>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 08 FEEDING NEW SOURCES -->
+  <section class="zone" id="z08" data-title="New sources">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">08</span>
+        <h2 class="zone__title">Feeding it<br>new sources</h2>
+      </header>
+      <p class="zone__lede">When you analyze another great explainer, hand the analysis to <code>update-playbook</code>. It keeps the patterns and leaves the words behind.</p>
+      <ul class="zone__points">
+        <li>New arcs, devices, metaphors and diagrams get filed where they belong.</li>
+        <li>Branding, characters, catchphrases and pitches get dropped.</li>
+        <li>Each update bumps the version and adds a changelog line.</li>
+      </ul>
+      <p class="aphorism">Keep the pattern. Leave the words.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 400" role="img" aria-label="Gate: is the pattern reusable and original? Yes goes to the playbook, no is left out">
+        <g class="pop" style="--i:0"><rect class="d-node" x="40" y="140" width="200" height="80" rx="8"/><text class="d-label" x="140" y="186" text-anchor="middle">NEW SOURCE</text></g>
+        <path class="d-line draw arrow" pathLength="1" style="--i:1" d="M240,180 H370"/>
+        <g class="pop" style="--i:2">
+          <polygon class="d-node" points="480,80 580,180 480,280 380,180"/>
+          <text class="d-label d-label--sm" x="480" y="172" text-anchor="middle">REUSABLE AND</text>
+          <text class="d-label d-label--sm" x="480" y="194" text-anchor="middle">ORIGINAL?</text>
+        </g>
+        <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:3" d="M580,180 H692"/>
+        <text class="d-label d-label--accent pop" style="--i:4" x="606" y="166">YES</text>
+        <g class="pop" style="--i:4"><rect class="d-shadow" x="706" y="146" width="220" height="80" rx="8"/><rect class="d-node" x="700" y="140" width="220" height="80" rx="8"/><text class="d-label d-label--accent" x="810" y="186" text-anchor="middle">THE PLAYBOOK</text></g>
+        <path class="d-line d-line--soft draw arrow" pathLength="1" style="--i:5" d="M480,280 V314"/>
+        <text class="d-label d-label--soft pop" style="--i:6" x="494" y="306">NO</text>
+        <g class="pop" style="--i:6"><rect class="d-node--muted" x="390" y="322" width="180" height="56" rx="8"/><text class="d-label d-label--soft" x="480" y="356" text-anchor="middle">LEAVE IT</text></g>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 09 SYNTHESIS -->
+  <section class="zone zone--wide" id="z09" data-title="Make it real">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">09</span>
+        <h2 class="zone__title">Make it real</h2>
+      </header>
+      <p class="zone__lede">One request, all four pieces at work. Each line in the finished page traces back to the piece that shaped it.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 540" role="img" aria-label="One request; each of the four pieces shapes one part of the output page">
+        <g class="pop" style="--i:0"><rect class="d-node--ink" x="230" y="24" width="500" height="60" rx="8"/><text class="d-label d-label--on-ink" x="480" y="60" text-anchor="middle">&gt; EXPLAIN HOW OUR INVOICING WORKS</text></g>
+        <path class="d-line d-line--soft draw arrow" pathLength="1" style="--i:1" d="M480,84 V164"/>
+        <g class="pop" style="--i:2">
+          <rect class="d-shadow" x="406" y="176" width="510" height="340" rx="8"/><rect class="d-node" x="400" y="170" width="510" height="340" rx="8"/>
+          <text class="d-label d-label--sm d-label--soft" x="424" y="200">INVOICING.HTML</text>
+          <text class="d-label" x="430" y="246">ARC A · FOUR PIECES</text>
+          <text class="d-label" x="430" y="316">BANK ACCESS DRAWN AS A DOOR</text>
+          <text class="d-label" x="430" y="386">PIPELINE: QUOTE → PAID</text>
+          <text class="d-label" x="430" y="456">SHORTER LEDES (LAST WEEK'S FIX)</text>
+        </g>
+        <g class="pop" style="--i:3"><rect class="d-node" x="30" y="220" width="180" height="40" rx="20" style="stroke:var(--accent)"/><text class="d-label d-label--sm" x="120" y="245" text-anchor="middle">1 RECIPE</text></g>
+        <g class="pop" style="--i:3"><rect class="d-node" x="30" y="290" width="180" height="40" rx="20" style="stroke:var(--accent-2)"/><text class="d-label d-label--sm" x="120" y="315" text-anchor="middle">2 LIBRARY</text></g>
+        <g class="pop" style="--i:3"><rect class="d-node" x="30" y="360" width="180" height="40" rx="20" style="stroke:var(--accent-3)"/><text class="d-label d-label--sm" x="120" y="385" text-anchor="middle">3 PARTS BIN</text></g>
+        <g class="pop" style="--i:3"><rect class="d-node" x="30" y="430" width="180" height="40" rx="20" style="stroke:var(--slate)"/><text class="d-label d-label--sm" x="120" y="455" text-anchor="middle">4 LOOP</text></g>
+        <path class="d-line d-line--accent draw" pathLength="1" style="--i:4" d="M210,240 H420"/>
+        <path class="d-line d-line--a2 draw" pathLength="1" style="--i:5" d="M210,310 H420"/>
+        <path class="d-line d-line--a3 draw" pathLength="1" style="--i:6" d="M210,380 H420"/>
+        <path class="d-line d-line--slate draw" pathLength="1" style="--i:7" d="M210,450 H420"/>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- 10 GUARDRAILS + CAVEAT -->
+  <section class="zone zone--flip" id="z10" data-title="Still your call">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">10</span>
+        <h2 class="zone__title">Still your call</h2>
+      </header>
+      <p class="zone__lede">This isn't zero work. The first few pages need a careful read, and the playbook only gets sharper when you correct it.</p>
+      <p class="aphorism">A playbook nobody corrects stays a first draft.</p>
+    </div>
+    <figure class="zone__figure">
+      <div class="cards">
+        <div class="card card--paper pop" style="--i:0"><span class="card__icon" aria-hidden="true">✎</span><p class="card__title">You pick the topic</p><p class="card__body">And who it's for. That decides the arc.</p></div>
+        <div class="card card--paper pop" style="--i:1"><span class="card__icon" aria-hidden="true">✓</span><p class="card__title">You review every page</p><p class="card__body">Nothing gets published without your yes.</p></div>
+        <div class="card card--paper pop" style="--i:2"><span class="card__icon" aria-hidden="true">▣</span><p class="card__title">You decide what's a rule</p><p class="card__body">One-off taste stays in the page. Patterns go in the playbook.</p></div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 11 LOOP-BACK -->
+  <section class="zone zone--wide" id="z11" data-title="The whole system">
+    <div class="zone__text">
+      <header class="zone__head">
+        <span class="zone__num">11</span>
+        <h2 class="zone__title">The whole system</h2>
+      </header>
+      <p class="zone__lede">Recipe, library, parts bin, loop: four pieces and one page each time. Start with piece one and give it a topic you know well.</p>
+    </div>
+    <figure class="zone__figure">
+      <svg viewBox="0 0 960 400" role="img" aria-label="The opening diagram again, with each piece labeled by the file that holds it">
+        <g class="pop" style="--i:0">
+          <rect class="d-shadow" x="46" y="168" width="220" height="76" rx="8"/>
+          <rect class="d-node--accent" x="40" y="162" width="220" height="76" rx="8"/>
+          <text class="d-label d-label--on-accent" x="150" y="206" text-anchor="middle">YOUR TOPIC</text>
+        </g>
+        <path class="d-line d-line--accent draw" pathLength="1" style="--i:1"
+              d="M260,200 H310 M310,92 V308 M310,92 H352 M310,164 H352 M310,236 H352 M310,308 H352"/>
+        <g class="pop" style="--i:3"><rect class="d-node" x="360" y="68" width="330" height="48" rx="8"/><text class="d-label" x="376" y="98">1 THE RECIPE</text><text class="d-label d-label--sm d-label--soft" x="676" y="98" text-anchor="end">SKILL.MD</text></g>
+        <g class="pop" style="--i:4"><rect class="d-node" x="360" y="140" width="330" height="48" rx="8"/><text class="d-label" x="376" y="170">2 THE LIBRARY</text><text class="d-label d-label--sm d-label--soft" x="676" y="170" text-anchor="end">REFERENCES/</text></g>
+        <g class="pop" style="--i:5"><rect class="d-node" x="360" y="212" width="330" height="48" rx="8"/><text class="d-label" x="376" y="242">3 THE PARTS BIN</text><text class="d-label d-label--sm d-label--soft" x="676" y="242" text-anchor="end">ASSETS/</text></g>
+        <g class="pop" style="--i:6"><rect class="d-node" x="360" y="284" width="330" height="48" rx="8"/><text class="d-label" x="376" y="314">4 THE LOOP</text><text class="d-label d-label--sm d-label--soft" x="676" y="314" text-anchor="end">UPDATE-PLAYBOOK</text></g>
+        <path class="d-line d-line--accent draw arrow-accent" pathLength="1" style="--i:7"
+              d="M690,92 H730 M690,164 H730 M690,236 H730 M690,308 H730 M730,92 V308 M730,200 H772"/>
+        <g class="pop" style="--i:8">
+          <rect class="d-shadow" x="786" y="166" width="150" height="80" rx="8"/>
+          <rect class="d-node--accent" x="780" y="160" width="150" height="80" rx="8"/>
+          <text class="d-label d-label--on-accent" x="855" y="206" text-anchor="middle">YOUR PAGE</text>
+        </g>
+      </svg>
+    </figure>
+  </section>
+
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const zones = [...document.querySelectorAll('.zone')];
+
+  // Minimap rail: built from each zone's number + data-title
+  const list = document.getElementById('railList');
+  const links = zones.map((z, i) => {
+    const num = (z.querySelector('.zone__num, .label')?.textContent || String(i + 1).padStart(2, '0')).trim();
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + z.id;
+    a.innerHTML = '<span class="n"></span><span class="t"></span>';
+    a.querySelector('.n').textContent = num;
+    a.querySelector('.t').textContent = z.dataset.title || '';
+    a.addEventListener('click', e => { e.preventDefault(); go(i); });
+    li.appendChild(a); list.appendChild(li);
+    return a;
+  });
+
+  // Reveal: add .in-view once, then .settled after the draw-in finishes (shows arrowheads)
+  const reveal = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const z = en.target;
+      z.classList.add('in-view');
+      setTimeout(() => z.classList.add('settled'), reduce ? 0 : 1900);
+      reveal.unobserve(z);
+    });
+  }, { threshold: 0.22 });
+  zones.forEach(z => reveal.observe(z));
+
+  // Active zone: the one crossing the middle of the viewport
+  let current = 0;
+  const active = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      current = zones.indexOf(en.target);
+      links.forEach((a, i) => a.setAttribute('aria-current', i === current ? 'true' : 'false'));
+      links[current].scrollIntoView({ block: 'nearest' });
+    });
+  }, { rootMargin: '-48% 0px -48% 0px' });
+  zones.forEach(z => active.observe(z));
+
+  function go(i) {
+    i = Math.max(0, Math.min(zones.length - 1, i));
+    zones[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  // Keyboard stepping, like a camera stopping on each zone
+  addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest('input, textarea, select, button, [contenteditable]')) return;
+    const next = ['ArrowDown', 'ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !e.shiftKey);
+    const prev = ['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey);
+    if (next) { e.preventDefault(); go(current + 1); }
+    else if (prev) { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(zones.length - 1); }
+  });
+
+  // Fit each zone diagram's viewBox to its drawn content, so unused margins don't shrink the labels.
+  // Opt out per diagram with <svg data-fit="off">. Runs after fonts load (text width depends on them),
+  // with pop/stamp transforms neutralized so the measurement is the final, in-view size.
+  const fit = () => {
+    root.classList.add('measuring');
+    document.querySelectorAll('.zone__figure > svg:not([data-fit="off"])').forEach(svg => {
+      try {
+        const b = svg.getBBox(), pad = 14;
+        if (b.width && b.height) svg.setAttribute('viewBox', `${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`);
+      } catch (_) {}
+    });
+    root.classList.remove('measuring');
+  };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
+
+  // Progress bar
+  const bar = document.getElementById('progress');
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // Theme toggle (remembered per viewer; storage may be unavailable)
+  const btn = document.getElementById('themeBtn');
+  try { const t = localStorage.getItem('bp-theme'); if (t) root.dataset.theme = t; } catch (_) {}
+  btn.addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('bp-theme', root.dataset.theme); } catch (_) {}
+  });
+})();
+</script>
+</body>
+</html>
