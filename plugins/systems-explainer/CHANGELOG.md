@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — 2026-10-12
+Motion grammar: reader-driven motion for both page types, decided by a side-by-side review.
+- `shared/motion.md`: **motion answers the reader's question; it never plays at the reader.** Tier 1 (use): M3 State ("simulate a case") and M4 Trace ("what does this touch?"). Tier 2 (only on explicit request): M1 Flow, M2 Build, M5 Sequence, M6 Count. Rules: complete at rest, every highlight explained, keyboard-operable, reduced-motion safe, small budgets.
+- Review evidence, on a dense reference architecture built static and with motion: M3 outcome simulators were very useful in both versions. M4 architecture tracing was useful but confusing until each lit item said why, so it now has IN/OUT relation labels, a status line, click-to-pin, and a Connections row in each detail panel. Count-ups and step builds weren't noticed. A flow dot on a finished loop diagram hurt the aesthetic. Auto-highlighting stations that can't be clicked added nothing.
+- `shared/motion.css` + `shared/motion.js`: a dependency-free runtime driven by data attributes, synced into both templates as MOTION-CSS / MOTION-JS blocks by `sync_tokens.py` and verified by `check_page.py`.
+- Component libraries mark each motion snippet Tier 1 or "on request only". The checklists, the explainer's visual-language §7 and the reference method follow the tiers.
+- Fixed: `check_page.py` hung on Windows when an inline script held non-ASCII characters. Scripts are now passed to node as UTF-8, with a timeout.
+- Fixed in testing: highlighted labels on accent fills keep their contrast, dimming overrides the entrance animation's opacity, and relation labels wrap rather than widening their lane.
+
 ## 0.3.0 — 2026-10-12
 Prepared for publishing on GitHub as `elmiller9/systems-explainer`.
 - The repository is now a marketplace (`elmiller9`) with the plugin in `plugins/systems-explainer/`. Only that folder is installed, so local source analyses and test pages can't be shipped by mistake.

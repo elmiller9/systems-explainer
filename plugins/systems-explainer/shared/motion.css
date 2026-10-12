@@ -1,0 +1,61 @@
+/* ============================================================
+   SHARED MOTION STYLES — systems-explainer plugin (see shared/motion.md)
+   Synced into both templates by scripts/sync_tokens.py. Edit here only.
+   Every rule below is gated on html.motion-on (set by motion.js when the
+   reader allows motion) or is an interaction state, so pages are complete
+   at rest, without script, and under prefers-reduced-motion.
+   ============================================================ */
+[hidden] { display: none !important; }
+
+/* M1 Flow */
+.m-guide { fill: none; stroke: none; }
+.m-token { fill: var(--accent); stroke: var(--card); stroke-width: 3; opacity: 0; pointer-events: none; }
+html.motion-on .m-token.is-running { opacity: 1; transition: opacity .2s; }
+.is-hit rect, .is-hit polygon, .is-hit circle, rect.is-hit, polygon.is-hit, circle.is-hit,
+.is-hit.card, .is-hit.steps > div { stroke: var(--accent) !important; }
+.is-hit text:not(.d-label--on-accent):not(.d-label--on-ink), text.is-hit { fill: var(--accent); }
+html.motion-on .is-hit rect, html.motion-on rect.is-hit, html.motion-on .is-hit polygon { transition: stroke .15s; }
+[data-flow-figure] { cursor: pointer; }
+
+/* M2 Build */
+html.motion-on [data-step]:not(.is-shown) { opacity: 0 !important; transform: translateY(8px) !important; }
+html.motion-on [data-step] { transition: opacity .45s ease-out, transform .45s ease-out; transform-box: fill-box; }
+.m-steps-hint { font: 700 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+html:not(.motion-on) .m-steps-hint { display: none; }
+
+/* M3 State + M4 Trace: dim/lit are interaction states, not motion */
+.is-dim { opacity: .28 !important; }
+.is-lit rect, .is-lit polygon, rect.is-lit, polygon.is-lit { stroke: var(--accent) !important; }
+.is-lit text:not(.d-label--on-accent):not(.d-label--on-ink), text.is-lit { fill: var(--accent); }
+path.is-lit, line.is-lit { stroke: var(--accent) !important; }
+.is-lit.rung, .is-lit.from, .is-lit.to, .is-lit.item, .is-lit.card { border-color: var(--accent) !important; box-shadow: inset 4px 0 0 var(--accent); }
+html.motion-on .is-dim, html.motion-on .is-lit { transition: opacity .3s, stroke .3s, fill .3s, border-color .3s; }
+html.motion-on [data-when], html.motion-on [data-links], html.motion-on [data-node] { transition: opacity .3s; }
+.m-states { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--card); max-width: 100%; }
+.m-states button { font: 600 13px var(--f-body); border: 0; background: transparent; color: var(--ink-soft); padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+.m-states button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.m-say { font-size: 15px; max-width: 64ch; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+/* M4 relation chips: every lit item says how it connects to the traced one */
+.m-rel:empty { display: none; }
+.m-rel { flex: none; font: 700 10.5px var(--f-mono); letter-spacing: .05em; text-transform: uppercase;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card)); border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
+/* labels wrap under the item name instead of widening the lane */
+.item:has(> .m-rel:not(:empty)) { flex-wrap: wrap; row-gap: 4px; }
+.item > .m-rel { white-space: normal; max-width: 100%; }
+.is-origin.item, .is-origin.card { background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
+.is-origin .m-rel { color: var(--on-accent); background: var(--accent); }
+.m-trace-status { font-size: 14.5px; color: var(--ink); min-height: 1.5em; }
+[data-node] { cursor: pointer; }
+[data-node]:focus { outline: none; }
+[data-node]:focus-visible rect, [data-node]:focus-visible polygon { stroke-dasharray: 5 4; }
+
+/* M5 Sequence */
+.is-active rect, .is-active polygon, rect.is-active { stroke: var(--accent) !important; fill: var(--card); }
+.is-active text:not(.d-label--on-accent):not(.d-label--on-ink) { fill: var(--accent); }
+.is-active[data-seq-item]:not(g):not(rect) { border-color: var(--accent) !important; box-shadow: inset 0 -4px 0 var(--accent); }
+html.motion-on [data-seq-item] { transition: border-color .25s, box-shadow .25s; }
+
+/* Shared caption that tells the reader what to watch */
+.m-watch { font: 700 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.m-replay { font: 700 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); background: none; border: 1.5px solid var(--rule); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+html:not(.motion-on) .m-replay, html:not(.motion-on) .m-watch--motion { display: none; }

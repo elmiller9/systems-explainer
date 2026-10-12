@@ -322,3 +322,58 @@
   <div class="card card--paper pop" style="--i:1"><span class="card__icon" aria-hidden="true">✓</span><p class="card__title">{{RULE TWO}}</p><p class="card__body">{{One line.}}</p></div>
   <div class="card card--paper pop" style="--i:2"><span class="card__icon" aria-hidden="true">⏸</span><p class="card__title">{{RULE THREE}}</p><p class="card__body">{{One line.}}</p></div>
 </div>
+
+
+<!-- =====================================================================
+     MOTION — read ${CLAUDE_PLUGIN_ROOT}/shared/motion.md first.
+     TIER 1 (use): M3 State, M4 Trace — reader-driven, every highlight explained.
+     TIER 2 (ON REQUEST ONLY — failed review as autoplay): M1 Flow, M2 Build, M5 Sequence, M6 Count.
+     Budget: Tier 1 on 2–3 zones at most; never in zone 01.
+     ===================================================================== -->
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M1 FLOW — a token travels a pipeline; stations flash as it passes (add to S2 pipeline) =====
+     Give each station <g> an id, add an invisible guide path through their centers, then the token. -->
+<path id="{{zNN}}-flow" class="m-guide" d="M120,130 H840"/>
+<circle class="m-token" r="9" data-flow="#{{zNN}}-flow" data-dur="3.2" data-rounds="2"
+        data-hits="0.0 #{{zNN}}-a; 0.33 #{{zNN}}-b; 0.66 #{{zNN}}-c; 1 #{{zNN}}-d"/>
+<!-- caption under the figure: -->
+<p class="m-watch m-watch--motion">Watch: {{what travels}} · click to replay</p>
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M2 BUILD — reveal the zone's diagram in narrated steps (≤ 4). Put data-step on <g> groups,
+     and the hint in the zone text. ↓ / Space reveals the next step before moving to the next zone. -->
+<g data-step="1">{{first part}}</g>
+<g data-step="2">{{second part}}</g>
+<g data-step="3">{{the payoff}}</g>
+<p class="m-steps-hint"></p>
+
+<!-- ===== [TIER 1] M3 STATE — "simulate a case": choose an input, see which parts it produces (outcomes, routing, permissions).
+     Every case needs a data-say sentence explaining WHY, including the check or trap it implies. ===== -->
+<figure class="zone__figure" data-states>
+  <div class="m-states" role="group" aria-label="{{Scenario}}">
+    <button type="button" data-set-state="all" aria-pressed="true">All</button>
+    <button type="button" data-set-state="{{a}}">{{Case A}}</button>
+    <button type="button" data-set-state="{{b}}">{{Case B}}</button>
+  </div>
+  <svg viewBox="0 0 960 480" role="img" aria-label="{{…}}">
+    <g data-when="{{a}}">{{path + node for case A}}</g>
+    <g data-when="{{b}}">{{path + node for case B}}</g>
+  </svg>
+  <p class="m-say" data-say="{{a}}" hidden>{{What case A shows.}}</p>
+  <p class="m-say" data-say="{{b}}" hidden>{{What case B shows.}}</p>
+</figure>
+
+<!-- ===== [TIER 1] M4 TRACE — hover/focus a node to light its connections. REQUIRED: data-rel labels on every linked
+     element ("core:IN · what it sends") and a <p class="m-trace-status" data-trace-status> line near the figure. ===== -->
+<svg viewBox="0 0 960 540" data-trace-scope role="img" aria-label="{{…}}">
+  <g data-node="{{core}}">{{hub}}</g>
+  <g data-node="{{intel}}" data-links="{{core}}" data-rel="{{core}}:IN · {{what intel sends the core}}">{{spoke}}</g>
+  <path class="d-line" data-links="{{core}} {{intel}}" d="{{…}}"/>
+</svg>
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M5 SEQUENCE — stations take turns (S6 loop, ordered stacks). Put data-seq-item on station <g>s. ===== -->
+<svg viewBox="0 0 960 540" data-sequence data-seq-ms="850" data-rounds="2">
+  <g data-seq-item>{{station 1}}</g><g data-seq-item>{{station 2}}</g><g data-seq-item>{{station 3}}</g>
+</svg>
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M6 COUNT — the one number that is the point. Markup holds the final value. ===== -->
+<text class="d-title d-title--accent"><tspan data-count>{{64}}</tspan></text>

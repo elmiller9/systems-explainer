@@ -129,5 +129,6 @@ Find the concept, then draw the object. Add new rows as topics demand; this tabl
 - **Draw-in:** lines and paths with class `draw` animate their stroke from start to end when the zone enters the viewport (about 0.9 s, ease-out). The template handles this with `pathLength="1"` plus a dash offset.
 - **Pop-in:** nodes and cards with class `pop` scale from 0.85 to 1 and fade in (0.35 s), staggered with `style="--i:N"`.
 - **Stamp:** a single element with class `stamp` drops and rotates slightly. Use it once per page at most.
-- No motion blur, parallax, horizontal camera moves or continuous looping animation.
+- **Explanatory motion (M1–M6)** goes beyond these entrances: flows, narrated builds, state toggles, traces, sequences and counts. It is governed by `shared/motion.md` (the test, the budget and the markup). The runtime ships in the template's MOTION blocks.
+- No motion blur, parallax, horizontal camera moves or continuous looping animation; flows and sequences run a set number of rounds, then stop.
 - Under `prefers-reduced-motion: reduce`, everything appears immediately in its final state.

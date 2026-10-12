@@ -12,6 +12,7 @@ This skill's folder is `${CLAUDE_SKILL_DIR}` and the plugin root is `${CLAUDE_PL
 
 ## Before you start
 - `${CLAUDE_PLUGIN_ROOT}/shared/versions.md`: which version to build, and the **both mode** workflow. **Always read it.** If the request doesn't say which version, ask once (educational, detailed, or both).
+- `${CLAUDE_PLUGIN_ROOT}/shared/motion.md`: the motion grammar (M1–M6), its test and its budget. Read it before adding any motion; motion is optional and must pass the test.
 - `${CLAUDE_SKILL_DIR}/references/method.md`: principles, the source-to-component mapping and page structure. **Always read it.**
 - `${CLAUDE_SKILL_DIR}/references/quality-checklist.md`: the pre-handover checks.
 - `${CLAUDE_SKILL_DIR}/assets/template.html`: the page skeleton with the shared tokens and generic script. Copy it and never edit it in place.

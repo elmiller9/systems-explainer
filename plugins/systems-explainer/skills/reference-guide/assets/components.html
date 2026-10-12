@@ -181,3 +181,45 @@
     </tbody>
   </table>
 </div>
+
+
+<!-- =====================================================================
+     MOTION — read ${CLAUDE_PLUGIN_ROOT}/shared/motion.md first.
+     TIER 1 (use): M3 State on taxonomies/scenarios, M4 Trace on the architecture explorer. At most 3 uses.
+     TIER 2 (ON REQUEST ONLY): M5 Sequence, M6 Count — autoplay highlights on non-clickable items failed review.
+     ===================================================================== -->
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M5 SEQUENCE on R6 steps — the pipeline walks itself twice when scrolled into view; click to replay ===== -->
+<div class="steps" data-sequence data-seq-ms="800" data-rounds="2">
+  <div data-seq-item><b>{{Step}}</b><small>{{…}}</small></div>
+  <div data-seq-item><b>{{Step}}</b><small>{{…}}</small></div>
+</div>
+
+<!-- ===== [TIER 1] M3 STATE on R7 ladder — "simulate a case" lights the outcome(s) it produces ===== -->
+<div data-states>
+  <div class="m-states" role="group" aria-label="Simulate a case">
+    <button type="button" data-set-state="all" aria-pressed="true">All outcomes</button>
+    <button type="button" data-set-state="{{case}}">{{Case}}</button>
+  </div>
+  <div class="ladder">
+    <div class="rung" data-when="{{case}}"><b>{{Category}}</b><span>{{…}}</span><span>{{…}}</span></div>
+  </div>
+  <p class="m-say" data-say="{{case}}" hidden>{{What the case shows, and the check that catches it.}}</p>
+</div>
+
+<!-- ===== [TIER 1] M4 TRACE on R5 explorer — hover or select an item: its connections light up AND say why.
+     Required: data-trace-scope + data-trace-pressed on the [data-explorer] box; a status line; data-node on every
+     .item; data-links = its neighbors; data-rel = the label it shows when each neighbor is traced, from that neighbor's
+     point of view (IN · what this item sends it / OUT · what this item receives from it); and a "Connections" row in
+     each detail panel listing the same edges in plain text (works without script). Only source-backed edges. ===== -->
+<div data-explorer data-trace-scope data-trace-pressed>
+  <p class="m-trace-status" data-trace-status>Hover or select a module to see what it connects to.</p>
+  <button class="item" type="button" data-key="{{a}}" data-node="{{a}}" data-links="{{b}}"
+          data-rel="{{b}}:IN · {{what A sends B}}">{{A}}</button>
+  <button class="item" type="button" data-key="{{b}}" data-node="{{b}}" data-links="{{a}}"
+          data-rel="{{a}}:OUT · {{what B receives from A}}">{{B}}</button>
+  <dl class="detail" data-panel="{{a}}">… <div class="full"><dt>Connections</dt><dd>OUT to {{B}}: {{what A sends B}}</dd></div></dl>
+</div>
+
+<!-- ===== [TIER 2 · ON REQUEST ONLY] M6 COUNT on the hero key figure ===== -->
+<span class="keyfig__num"><span data-count>{{64}}</span> / {{84}}</span>

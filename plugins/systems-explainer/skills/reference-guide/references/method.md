@@ -24,7 +24,8 @@ The reference guide is the **detailed companion** to the blueprint explainer. Th
 5. **Color has meaning.** Semantic chips (ok, gap, ai, human) carry classification consistently across the whole page. The terracotta accent marks a key row, the active item or the one figure that matters.
 6. **Flag what's wrong in the source.** If two figures contradict each other, or a claim has no support, say so plainly in the footer, and in the section when it matters. Pick one figure, and say which and why.
 7. **Calm, plain prose.** Short declarative sentences in the active voice. No hype, no aphorisms (those belong to the explainer) and no presenter persona.
-8. **Complete without script.** All content is visible in the HTML. Script only adds the contents rail, switching, filtering and the theme toggle. Hidden tab panels are the only content not visible at rest.
+8. **Motion only when the reader asks a question.** A taxonomy can answer "simulate a case" (M3), and an architecture explorer can answer "what does this touch?" (M4), with every lit item saying IN or OUT and why. Three uses at most. No autoplay highlights, counters or walking pipelines. See `shared/motion.md`.
+9. **Complete without script.** All content is visible in the HTML. Script only adds the contents rail, switching, filtering and the theme toggle. Hidden tab panels are the only content not visible at rest.
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "systems-explainer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Builds single-page web apps that explain any system, in two companion versions sharing one palette: an educational blueprint explainer (numbered zones, object diagrams, one-line rules) and a detailed interactive reference guide. Build either one or both, and grow the playbook from new sources.",
   "author": {
     "name": "elmiller9",

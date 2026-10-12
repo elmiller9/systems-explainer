@@ -27,6 +27,7 @@ Run through this before handing over an explainer. Fix anything that fails; don'
 - [ ] Color is never the only signal; every colored line or tag also has a text label.
 
 ## Screen & interaction
+- [ ] Motion (if any) follows `shared/motion.md`: Tier 1 only (M3 State, M4 Trace) unless the user asked for more; at most 2–3 zones; none in zone 01; every highlight explained (`data-say` or `data-rel`); the page reads completely with reduced motion.
 - [ ] Every zone's text and diagram fit a **1366×670 viewport** (a 1366×768 laptop after browser toolbars) without scrolling inside the zone. Measure it; don't eyeball it.
 - [ ] Diagram labels render at about 10 px or more on a 1366 laptop. Split-zone diagrams are the usual offenders, so check a screenshot.
 - [ ] At 1920×1080, the diagrams use the width, without big empty gutters or tiny diagrams.

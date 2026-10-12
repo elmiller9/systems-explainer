@@ -6,7 +6,7 @@ A Claude Code plugin that turns any topic or source document into single-page we
 - **Detailed: reference guide.** An interactive reference that keeps nearly all of a source document in its own section order. It has a contents rail, tables, switchable views, filters, an architecture explorer, taxonomies, scenarios and a roadmap.
 - **Both.** Built from one reading of the source and linked to each other. The explainer is the front door, and the reference is the manual behind it.
 
-Pages are self-contained HTML files with light and dark themes. Open them in a browser, or publish them wherever you host static pages.
+Pages are self-contained HTML files with light and dark themes. Optional, reader-driven motion ("simulate a case" buttons that show which outcome a scenario produces, and architecture maps that light up what a part connects to and why) follows a small motion grammar. Every page reads completely without it, and with reduced motion. Open them in a browser, or publish them wherever you host static pages.
 
 See [`examples/systems-explainer-tour.html`](examples/systems-explainer-tour.html) for a finished explainer: a tour of this plugin, built with this plugin. Download it and open it in a browser.
 
@@ -103,6 +103,8 @@ plugins/systems-explainer/          the plugin; the only folder that gets instal
   skills/update-playbook/           the improvement loop
   shared/tokens.css                 the one palette + type for both versions
   shared/versions.md                choosing a version; the both-mode workflow
+  shared/motion.md                  the motion grammar (M1–M6): when motion earns its place
+  shared/motion.css, motion.js      the motion runtime, synced into both templates
   scripts/sync_tokens.py            copies shared tokens into the templates (--check to verify)
   scripts/check_page.py             pre-handover checks for a generated page
   CHANGELOG.md
